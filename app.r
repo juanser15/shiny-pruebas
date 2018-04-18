@@ -1,7 +1,10 @@
-library(rhandsontable)
-library(plotly)
-library(shinydashboard)
-library(shiny)
+   library(rhandsontable)
+   library(plotly)
+   library(shinydashboard)
+   library(shiny)
+library(dplyr)
+library(dbplyr)
+library(purrr)
 
 my_username <- "Molca"
 my_password <- "Molca"
