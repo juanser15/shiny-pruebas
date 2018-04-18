@@ -11,6 +11,11 @@ library(highcharter)
 library(htmltools)
 library(scales)
 
+Fuente <- "C:/Users/juana/Desktop/APP MOLCA Last/Data.xlsx"
+tab <- data.frame(read_excel(Fuente, sheet = "Business Inputs"))
+tab <- data.frame(tab)
+colnames(tab) <- c("Variables", gsub("X","",colnames(tab)[-1])) 
+CPI.Argentina <- (1+tab[which(tab$Variables == "CPI Argentina"),paste0("",2017:2021)])
 
 
 my_username <- "Molca"
