@@ -1,1 +1,1 @@
-Example to the first app
+Example to the first app server
