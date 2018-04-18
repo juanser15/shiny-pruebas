@@ -9,15 +9,15 @@ library(plyr)
 library(dplyr)
 
 
-datos <- readRDS(file.path(file.path("data"), data.rds))
+#datos <- readRDS(file.path(file.path("data"), data.rds))
 
 
-#datos <- data.frame(Provincia = c(rep("Buenos Aires",100),rep("Cordoba",100),rep("Corrientes",100)),
- #                   Tipo_Alojamiento = rep("Departamentos", 300),
-  #                  Direcc = paste0("Direccion",1:300),
-   #                 Longitud = -runif(300,57,60), 
-    #                Latitud  = -runif(300,37,39),
-     #               Proveedor = c(rep("ZonProp",100),rep("Airbnb",100),rep("Booking",100)))
+datos <- data.frame(Provincia = c(rep("Buenos Aires",100),rep("Cordoba",100),rep("Corrientes",100)),
+                   Tipo_Alojamiento = rep("Departamentos", 300),
+                   Direcc = paste0("Direccion",1:300),
+                   Longitud = -runif(300,57,60), 
+                  Latitud  = -runif(300,37,39),
+                 Proveedor = c(rep("ZonProp",100),rep("Airbnb",100),rep("Booking",100)))
 
 
 vars <- c("Todas", sort(c("Jujuy","CABA","Entre Rios","Mendoza","Rio Negro","Salta",
