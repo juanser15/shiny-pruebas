@@ -64,7 +64,7 @@ Cell_editable <- ("function(instance, td, row, col, prop, value, cellProperties)
                   if (tbl.params.Row_numbers.includes(row)) td.style.background = 'lightblue';
                   }")
 
-options(shiny.sanitize.errors = TRUE)
+options(shiny.sanitize.errors = FALSE)
 ui <- dashboardPage( skin='blue',
                      dashboardHeader(title = "EMPRESA2",
                                      titleWidth = 200),
