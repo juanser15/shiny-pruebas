@@ -13,7 +13,7 @@ library(scales)
 
 #Fuente <- "C:/Users/juana/Desktop/APP MOLCA Last/Data.xlsx"
 DATA_DIR <- file.path("data")
-Fuente <-   file.path(DATA_DIR, "Data.xlsx")
+Fuente <-   file.path(DATA_DIR, "Datos.xlsx")
 tab <- data.frame(read_excel(Fuente, sheet = "Business Inputs"))
 tab <- data.frame(tab)
 colnames(tab) <- c("Variables", gsub("X","",colnames(tab)[-1])) 
