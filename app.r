@@ -5,14 +5,15 @@
    library(dplyr)
    library(dbplyr)
    library(purrr)
-library(shinyjs)
-library(readxl)
+   library(shinyjs)
+   library(readxl)
+library(shinyURL)
 
 my_username <- "Molca"
 my_password <- "Molca"
 
 ui <- dashboardPage( skin='blue',
-                     dashboardHeader(title = "EMPRESA1",
+                     dashboardHeader(title = "EMPRESA2",
                                      titleWidth = 200),
                      dashboardSidebar(uiOutput("sidebarpanel")),
                      dashboardBody(uiOutput("body"),
