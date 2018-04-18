@@ -1,18 +1,62 @@
-   library(rhandsontable)
-   library(plotly)
-   library(shinydashboard)
-   library(shiny)
-   library(dplyr)
-   library(dbplyr)
-   library(purrr)
-   library(shinyjs)
-   library(readxl)
+library(rhandsontable)
+library(plotly)
+library(shinydashboard)
+library(shiny)
+library(dplyr)
+library(dbplyr)
+library(purrr)
+library(shinyjs)
+library(readxl)
 library(highcharter)
 library(htmltools)
 library(scales)
 
+
+
 my_username <- "Molca"
 my_password <- "Molca"
+
+
+jsCode <- ("shinyjs.pageCol = function(params){
+$('body').css('background', params);
+$('h3.colorLabel').text(params); 
+};")
+
+js_click_line <- JS("function(event) {Shiny.onInputChange('line_clicked', [event.point.category]);}")
+js_bar_clicked <- JS("function(event) {Shiny.onInputChange('bar_clicked', [event.point.category]);}")
+
+Bold_function <- ("function (instance, td, row, col, prop, value, cellProperties) {
+                  Handsontable.renderers.TextRenderer.apply(this, arguments);
+                  td.style.background = 'lightblue';
+                  td.style.fontWeight = 'bold';
+                  }
+                  ")
+Bold_function_row <- ("function (instance, td, row, col, prop, value, cellProperties) {
+                  Handsontable.renderers.TextRenderer.apply(this, arguments);
+                  td.style.background = 'grey';
+                  td.style.fontWeight = 'bold';
+                  }
+                  ")
+
+BBB <- ("
+      function(instance, td, row, col, prop, value, cellProperties) {
+      Handsontable.renderers.TextRenderer.apply(this, arguments);
+      tbl = this.HTMLWidgets.widgets[0]
+      hrows = tbl.params.row_highlight
+      hrows = hrows instanceof Array ? hrows : [hrows]
+      if (hrows.includes(row)) {
+        td.style.background = 'lightgrey';
+        td.style.fontWeight = 'bold';
+            }
+            return td;
+        }")
+
+Cell_editable <- ("function(instance, td, row, col, prop, value, cellProperties) {
+                  Handsontable.NumericCell.renderer.apply(this, arguments);
+                  tbl = this.HTMLWidgets.widgets[0]
+                  if (tbl.params.Row_numbers.includes(row)) td.style.background = 'lightblue';
+                  }")
+
 
 ui <- dashboardPage( skin='blue',
                      dashboardHeader(title = "EMPRESA2",
