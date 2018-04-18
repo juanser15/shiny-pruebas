@@ -51,8 +51,8 @@ ui <- navbarPage("Alojamientos Argentina", id="nav",
 
       tags$head(
         # Include our custom CSS
-       includeScript(file.path('www', 'gomap.js')),
-    	        includeScript(file.path('www', 'styles.css'))
+      # includeScript(file.path('www', 'gomap.js')),
+    	  #      includeScript(file.path('www', 'styles.css'))
       
       ),
       
