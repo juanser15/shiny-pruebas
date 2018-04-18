@@ -8,15 +8,16 @@ library(leaflet)
 library(plyr)
 library(dplyr)
 
-# datos <- readRDS(paste0(Sys.getenv("USERPROFILE"),"\\Dropbox\\Momentum - Serur\\Desarrollos\\Consultoria-Hoteles\\",
-#                         "Shiny App - Camara Hotelera\\data\\data.rds"))
 
-datos <- data.frame(Provincia = c(rep("Buenos Aires",100),rep("Cordoba",100),rep("Corrientes",100)),
-                    Tipo_Alojamiento = rep("Departamentos", 300),
-                    Direcc = paste0("Direccion",1:300),
-                    Longitud = -runif(300,57,60), 
-                    Latitud  = -runif(300,37,39),
-                    Proveedor = c(rep("ZonProp",100),rep("Airbnb",100),rep("Booking",100)))
+datos <- readRDS(file.path(file.path("data"), data.rds))
+
+
+#datos <- data.frame(Provincia = c(rep("Buenos Aires",100),rep("Cordoba",100),rep("Corrientes",100)),
+ #                   Tipo_Alojamiento = rep("Departamentos", 300),
+  #                  Direcc = paste0("Direccion",1:300),
+   #                 Longitud = -runif(300,57,60), 
+    #                Latitud  = -runif(300,37,39),
+     #               Proveedor = c(rep("ZonProp",100),rep("Airbnb",100),rep("Booking",100)))
 
 
 vars <- c("Todas", sort(c("Jujuy","CABA","Entre Rios","Mendoza","Rio Negro","Salta",
@@ -50,8 +51,9 @@ ui <- navbarPage("Alojamientos Argentina", id="nav",
 
       tags$head(
         # Include our custom CSS
-        # includeCSS("C:\\Users\\juana\\Desktop\\Consultoria-Hoteles\\Shiny App - Camara Hotelera\\styles.css"),
-        # includeScript("C:\\Users\\juana\\Desktop\\Consultoria-Hoteles\\Shiny App - Camara Hotelera\\gomap.js")
+       includeScript(file.path('www', 'gomap.js')),
+    	        includeScript(file.path('www', 'styles.css'))
+      
       ),
       
       leafletOutput("map", width="100%", height="100%"),
