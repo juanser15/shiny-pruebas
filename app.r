@@ -3,16 +3,13 @@ library(readxl)
 library(rhandsontable)
 library(shinyURL)
 library(plotly)
-library(xlsx)
 library(shinydashboard)
 library(dplyr)
 library(dbplyr)
 library(purrr)
 library(shiny)
 library(highcharter)
-library(DT)
 library(htmltools)
-library(nycflights13)
 library(scales)
 my_username <- "Molca"
 my_password <- "Molca"
@@ -65,7 +62,7 @@ Cell_editable <- ("function(instance, td, row, col, prop, value, cellProperties)
 # CPI.Argentina <- (1+tab[which(tab$Variables == "CPI Argentina"),paste0("",2017:2021)])    
 
 ui <- dashboardPage( skin='blue',
-        # dashboardHeader(title = "Molino Cañuelas S.A.C.I.F.I.A",
+        # dashboardHeader(title = "Molino CaÃ±uelas S.A.C.I.F.I.A",
         dashboardHeader(title = "EMPRESA",
                         titleWidth = 200),
         dashboardSidebar(uiOutput("sidebarpanel")),
@@ -190,11 +187,11 @@ output$sidebarpanel <- renderUI({
       selectInput(inputId =  "month",label = "Select year:",
                   choices = 
                     list(
-                      "Año 2017" = 2017,
-                      "Año 2018" = 2018,
-                      "Año 2019" = 2019,
-                      "Año 2020" = 2020,
-                      "Año 2021" = 2021
+                      "AÃ±o 2017" = 2017,
+                      "AÃ±o 2018" = 2018,
+                      "AÃ±o 2019" = 2019,
+                      "AÃ±o 2020" = 2020,
+                      "AÃ±o 2021" = 2021
                     ),
                   selected =  2017,
                   selectize = FALSE)
@@ -537,7 +534,7 @@ if (USER$Logged == TRUE) {
                                                                                          DF.AGRO$mat$Productos),paste0("",2018:2021)],2,as.numeric),1,cumprod)))
     
     # Sales   ------------------------------------------------------------      
-    Dev <- as.numeric(DF1$mat[match("Devaluación ARS/USD (Avg)",DF1$mat$Variables),paste0("",2018:2021)])
+    Dev <- as.numeric(DF1$mat[match("DevaluaciÃ³n ARS/USD (Avg)",DF1$mat$Variables),paste0("",2018:2021)])
     
     Fact.Adjusted1 <- c(1963, 3795, 1984, 3708) 
     
