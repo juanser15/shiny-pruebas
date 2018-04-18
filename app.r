@@ -97,6 +97,7 @@ ui <- dashboardPage( skin='blue',
                                                           plotlyOutput("Ebitdatime", height = "300", width = "600" ))
                                                  ),
                                                  tags$footer("Notes"),
+                                                 tags$footer(Fuente),
                                                  tags$footer("RP = Retail Products"),
                                                  tags$footer("BIP = Branded and Industrial Products"),
                                                  tags$footer("ASSS = Agro Services and Sustainable Sourcing")
@@ -120,6 +121,7 @@ ui <- dashboardPage( skin='blue',
                                                    valueBoxOutput("Ebitdatime1")
                                                  ),
                                                  tags$footer("Notes"),
+                                                 tags$footer(Fuente),
                                                  tags$footer("RP = Retail Products"),
                                                  tags$footer("BIP = Branded and Industrial Products"),
                                                  tags$footer("ASSS = Agro Services and Sustainable Sourcing")
