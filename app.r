@@ -226,10 +226,10 @@ if (USER$Logged == TRUE) {
   #######################################
   # observeEvent(input$submit1, {
   # observe({
-  tab <- data.frame(read_excel(Fuente, sheet = "Valuacion"))
-  tab <- data.frame(tab)
-  colnames(tab) <- c("Variables", gsub("X","",colnames(tab)[-1]))
-  Value$mat<-tab
+  #tab <- data.frame(read_excel(Fuente, sheet = "Valuacion"))
+  #tab <- data.frame(tab)
+  #colnames(tab) <- c("Variables", gsub("X","",colnames(tab)[-1]))
+  #Value$mat<-tab
     
   DF1<-reactiveValues(mat=NULL)
   # observe({
