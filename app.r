@@ -2,15 +2,17 @@
    library(plotly)
    library(shinydashboard)
    library(shiny)
-library(dplyr)
-library(dbplyr)
-library(purrr)
+   library(dplyr)
+   library(dbplyr)
+   library(purrr)
+library(shinyjs)
+library(readxl)
 
 my_username <- "Molca"
 my_password <- "Molca"
 
 ui <- dashboardPage( skin='blue',
-                     dashboardHeader(title = "EMPRESA",
+                     dashboardHeader(title = "EMPRESA1",
                                      titleWidth = 200),
                      dashboardSidebar(uiOutput("sidebarpanel")),
                      dashboardBody(uiOutput("body"),
