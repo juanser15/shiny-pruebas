@@ -7,7 +7,9 @@
    library(purrr)
    library(shinyjs)
    library(readxl)
-library(shinyURL)
+library(highcharter)
+library(htmltools)
+library(scales)
 
 my_username <- "Molca"
 my_password <- "Molca"
