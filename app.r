@@ -1,16 +1,8 @@
-library(shinyjs)
-library(readxl)
 library(rhandsontable)
-library(shinyURL)
 library(plotly)
 library(shinydashboard)
-library(dplyr)
-library(dbplyr)
-library(purrr)
 library(shiny)
-library(highcharter)
-library(htmltools)
-library(scales)
+
 my_username <- "Molca"
 my_password <- "Molca"
 
