@@ -65,83 +65,98 @@ Cell_editable <- ("function(instance, td, row, col, prop, value, cellProperties)
                   }")
 
 options(shiny.sanitize.errors = FALSE)
-ui <- dashboardPage( skin='blue',
-                     dashboardHeader(title = "EMPRESA2",
-                                     titleWidth = 200),
-                     dashboardSidebar(uiOutput("sidebarpanel")),
-                     dashboardBody(uiOutput("body"),
-                                   tabsetPanel(id = "tabs",
-                                               tabPanel(
-                                                 title = "Main Dashboard",
-                                                 value = "page1",
-                                                 fluidRow(
-                                                   valueBoxOutput("total_flights"),
-                                                   valueBoxOutput("per_day"),
-                                                   valueBoxOutput("Ebitdapercentahe")
-                                                 ),
-                                                 fluidRow(
-                                                   column(width = 3, offset = 0,
-                                                          plotlyOutput("Sales", height = "300")),
-                                                   column(width = 3,  offset = 0,
-                                                          plotlyOutput("Cogs", height = "300")),
-                                                   column(width = 3,  offset = 0,
-                                                          plotlyOutput("barsplot", height = "300", width = "600"))
-                                                   
-                                                 ),
-                                                 fluidRow(
-                                                   column(width = 3, offset = 0,
-                                                          plotlyOutput("Ebitda", height = "300")),
-                                                   column(width = 3, offset = 0,
-                                                          plotlyOutput("Ebitdapct", height = "300")),
-                                                   column(width = 3, offset = 0,
-                                                          plotlyOutput("Ebitdatime", height = "300", width = "600" ))
-                                                 ),
-                                                 tags$footer("Notes"),
-                                                 tags$footer(Fuente),
-                                                 tags$footer("RP = Retail Products"),
-                                                 tags$footer("BIP = Branded and Industrial Products"),
-                                                 tags$footer("ASSS = Agro Services and Sustainable Sourcing")
-                                               ),
-                                               tabPanel(
-                                                 title = "Valuation Dashboard",
-                                                 value = "page11",
-                                                 fluidRow(
-                                                   valueBoxOutput("total_flights1"),
-                                                   valueBoxOutput("per_day1"),
-                                                   valueBoxOutput("Ebitdapercentahe1")
-                                                 ),
-                                                 fluidRow(
-                                                   valueBoxOutput("Sales1"),
-                                                   valueBoxOutput("Cogs1"),
-                                                   valueBoxOutput("barsplot1")
-                                                 ),
-                                                 fluidRow(
-                                                   valueBoxOutput("Ebitda1"),
-                                                   valueBoxOutput("Ebitdapct1"),
-                                                   valueBoxOutput("Ebitdatime1")
-                                                 ),
-                                                 tags$footer("Notes"),
-                                                 tags$footer(Fuente),
-                                                 tags$footer("RP = Retail Products"),
-                                                 tags$footer("BIP = Branded and Industrial Products"),
-                                                 tags$footer("ASSS = Agro Services and Sustainable Sourcing")
-                                               ),
-                                               
-                                               tabPanel(
-                                                 title = "Tables",
-                                                 tabPanel('Financial Statements', tabsetPanel(tabPanel("Balance Sheet", rHandsontableOutput('BS')),
-                                                                                              tabPanel("Income Statement", rHandsontableOutput('IS')),
-                                                                                              tabPanel("Cash Flows", rHandsontableOutput('CF')))),
-                                                 tabPanel('By segment', tabsetPanel(tabPanel("Retail Products", rHandsontableOutput('RP')),
-                                                                                    tabPanel("Branded Industrial Products", rHandsontableOutput('BIP')),
-                                                                                    tabPanel("Agro Services", rHandsontableOutput('AGRO')))),
-                                                 tabPanel('Inputs', tabsetPanel(tabPanel("Production Inputs", rHandsontableOutput('tabEdit2')),
-                                                                                tabPanel("Business Inputs", rHandsontableOutput('tabEdit1'))))
-                                               )  
-                                   )
-                     )
-)
 
+ui <- dashboardPage( skin='blue',
+        dashboardHeader(title = "Molino Cañuelas S.A.C.I.F.I.A",
+                        titleWidth = 200),
+        dashboardSidebar(uiOutput("sidebarpanel")),
+        dashboardBody(uiOutput("body"),
+        tabsetPanel(id = "tabs",
+                    tabPanel(
+                      title = "Main Dashboard",
+                      value = "page1",
+                      fluidRow(
+                      valueBoxOutput("total_flights"),
+                      valueBoxOutput("per_day"),
+                      valueBoxOutput("Ebitdapercentahe")
+                      ),
+                      fluidRow(
+                        column(width = 3, offset = 0,
+                               plotlyOutput("Sales", height = "300")),
+                        column(width = 3,  offset = 0,
+                               plotlyOutput("Cogs", height = "300")),
+                        column(width = 3,  offset = 0,
+                               plotlyOutput("barsplot", height = "300", width = "600"))
+                        
+                      ),
+                      fluidRow(
+                        column(width = 3, offset = 0,
+                               plotlyOutput("Ebitda", height = "300")),
+                        column(width = 3, offset = 0,
+                               plotlyOutput("Ebitdapct", height = "300")),
+                        column(width = 3, offset = 0,
+                               plotlyOutput("Ebitdatime", height = "300", width = "600" ))
+                      ),
+                      tags$footer("Notes"),
+                      tags$footer("RP = Retail Products"),
+                      tags$footer("BIP = Branded and Industrial Products"),
+                      tags$footer("ASSS = Agro Services and Sustainable Sourcing")
+                    ),
+                    tabPanel(
+                      title = "Valuation Dashboard",
+                      value = "page11",
+                      # Sidebar panel for inputs ----
+                      fluidRow( 
+                        sidebarPanel(
+                          sliderInput("RFreeR",
+                                      "Risk-Free Rate :",
+                                      value = 0.03,
+                                      min = 0,
+                                      step = 0.01, 
+                                      max = 1),
+                          sliderInput("CRiskP",
+                                      "Country Risk Premium:",
+                                      value = 0.03,
+                                      min = 0,
+                                      step = 0.01, 
+                                      max = 1),
+                          sliderInput("Beta",
+                                      "Company's beta:",
+                                      value = 1,
+                                      min = 0,
+                                      step = 0.1, 
+                                      max = 3)
+                      ),
+                        column(width = 6, offset = 1, style='padding:0px;',
+                        valueBoxOutput("EVEBITDA", width = 6),
+                        valueBoxOutput("WACC1", width = 6),
+                        valueBoxOutput("EV1", width = 6),
+                        valueBoxOutput("DEBEV", width = 6),
+                        valueBoxOutput("Beta", width = 6),
+                        valueBoxOutput("PRICEPER", width = 6)
+                        ) 
+                      ),
+                     fluidRow(
+                        plotlyOutput("WACC")
+                               
+                      )
+                    ),
+                    
+                    tabPanel(
+                      title = "Tables",
+                      tabPanel('Financial Statements', tabsetPanel(tabPanel("Balance Sheet", rHandsontableOutput('BS')),
+                                                                   tabPanel("Income Statement", rHandsontableOutput('IS')),
+                                                                   tabPanel("Cash Flows", rHandsontableOutput('CF')))),
+                      tabPanel('By segment', tabsetPanel(tabPanel("Retail Products", rHandsontableOutput('RP')),
+                                                         tabPanel("Branded Industrial Products", rHandsontableOutput('BIP')),
+                                                         tabPanel("Agro Services", rHandsontableOutput('AGRO')))),
+                      tabPanel('Inputs', tabsetPanel(tabPanel("Production Inputs", rHandsontableOutput('tabEdit2')),
+                                                     tabPanel("Business Inputs", rHandsontableOutput('tabEdit1'))))
+                    )  
+              )
+        )
+)
+ 
 ## server.R :
 
 server <- function(input, output, session) {
@@ -172,8 +187,8 @@ output$sidebarpanel <- renderUI({
   if (USER$Logged == TRUE) {
     
   dashboardSidebar(  
-    actionButton("Logout", "Logout", icon("sign-out-alt"), style='padding:6px; font-size:80%',
-                 class = "btn btn-primary"),
+    # actionButton("Logout", "Logout", icon("sign-out-alt"), style='padding:6px; font-size:80%',
+                 # class = "btn btn-primary"),
     textInput("caption", "Inserte su nombre"),
     verbatimTextOutput("valuename"),
     selectInput(
@@ -181,33 +196,32 @@ output$sidebarpanel <- renderUI({
       label = "By segment",  
       choices =  
         list(
-          "Summarize" = "all",
-          "Retail Products" = "RP",
-          "Branded Products" = "BIP",
-          "Agro Business" = "AGRO"
+          "Summarize" = "All",
+          "By segment" = "By Segment"
         ),
-      selected =  "all",
+      selected =  "By Segment",
       selectize = FALSE),
     sidebarMenu(
-      selectInput(inputId =  "month",label = "Select year:",
+      selectInput(inputId = "month",label = "Select year:",
                   choices = 
                     list(
-                      "Año 2017" = 2017,
-                      "Año 2018" = 2018,
-                      "Año 2019" = 2019,
-                      "Año 2020" = 2020,
-                      "Año 2021" = 2021
+                      "Año 2017" = "2017",
+                      "Año 2018" = "2018",
+                      "Año 2019" = "2019",
+                      "Año 2020" = "2020",
+                      "Año 2021" = "2021"
                     ),
-                  selected =  2017,
+                  selected =  "2017",
                   selectize = FALSE)
     ),
     numericInput("dollar", "Tipo de cambio:", 21, min = 1, max = 100),
     verbatimTextOutput("value"),
     numericInput("inflation", "CPI Argentina:", tab[which(tab == "CPI Argentina"), "2017"], min = 1, max = 100),
     verbatimTextOutput("value1"),
-    actionButton("saveBtn", "Save changes", icon("save"), style='padding:6px; font-size:80%',
+    # actionButton("saveBtn", "Save changes", icon("save"), style='padding:6px; font-size:80%',
+    # class = "btn btn-primary"),
+    actionButton("submit1" ,"Submit changes", icon("refresh"), style='padding:6px; font-size:80%',
     class = "btn btn-primary"),
-    actionButton("submit1" ,"Submit", icon("refresh"), style='padding:6px; font-size:80%'),
     checkboxInput("Default", "Default", value = TRUE, width = NULL)
   )
  }
@@ -226,10 +240,10 @@ if (USER$Logged == TRUE) {
   #######################################
   # observeEvent(input$submit1, {
   # observe({
-  #tab <- data.frame(read_excel(Fuente, sheet = "Valuacion"))
-  #tab <- data.frame(tab)
-  #colnames(tab) <- c("Variables", gsub("X","",colnames(tab)[-1]))
-  #Value$mat<-tab
+  tab <- data.frame(read_excel(Fuente, sheet = "Valuacion"))
+  tab <- data.frame(tab)
+  colnames(tab) <- c("Variables", gsub("X","",colnames(tab)[-1]))
+  Value$mat <- tab
     
   DF1<-reactiveValues(mat=NULL)
   # observe({
@@ -249,7 +263,7 @@ if (USER$Logged == TRUE) {
   BADLAR <- NULL
   output$tabEdit1 <- renderRHandsontable({  
   #Determino como formula los business inputs que son dependientes (Tipo de cambio promedio y Badlar)
-    for(i in 1:length(2017:2020)){MEAN[i] <<- mean(as.numeric(DF1$mat[2,paste0("",2017:2021)])[i:(i+1)])}
+    for(i in 1:length(2017:2020)){MEAN[i] <- mean(as.numeric(DF1$mat[2,paste0("",2017:2021)])[i:(i+1)])}
     for(i in 1:length(2017:2020)){BADLAR[i] <- (as.numeric(DF1$mat[5,paste0("",2017:2021)])[(i+1)]/
                                                   as.numeric(DF1$mat[5,paste0("",2017:2021)])[i]*
                                                   as.numeric(DF1$mat[8,paste0("",2017:2021)])[i])}
@@ -632,7 +646,7 @@ if (USER$Logged == TRUE) {
   })
   output$BS <- renderRHandsontable({
     DF.BS$mat[,3]<- 1/DF.BS$mat[,2]
-    DF.BS <- DF.IS$mat
+    DF.BS <- DF.BS$mat
     rhandsontable(DF.BS,  selectCallback = TRUE, width = 100000) %>%
       hot_col(2:ncol(DF.BS), format = "0,0[.]") %>%
       hot_col(1,renderer = Bold_function)
@@ -778,51 +792,45 @@ if (USER$Logged == TRUE) {
  
   output$Sales = renderPlotly({
     Product.Retail <- c("Flour Products", "Oil", "Biscuits, Cookies and Crackers", "Bread Crumbs and Premixes (& Pasta)", "Frozen Products")
-    CPI.Argentina[1] <- 1
-    
+    CPI.Argentina[1] <- 1 
     Value <-  eventReactive(input$submit1, {
-      input$inflation
-    })
-
-    if(input$Default == TRUE) {
-      
-      CPI.Argentina[input$month] <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),input$month])}
-      else {
-        CPI.Argentina[input$month] <- (1+Value()) }
-      
-    RP.TotalSales <-
-    colSums(as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2017"])%*%
-              t(cumprod(as.numeric(CPI.Argentina)))*
-              DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2017:2021)]/1000000)
-    AG.TotalSales <-
-      colSums(as.numeric(DF.AGRO$mat[match(paste0("Average Price - ",Product.Retail), DF.AGRO$mat$Productos),"2017"])%*%
-                t(cumprod(as.numeric(CPI.Argentina)))*
-                DF.AGRO$mat[match(Product.Retail, DF.AGRO$mat$Productos),paste0("",2017:2021)]/1000000)
-    BIP.TotalSales <-
-      colSums(as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.Retail), DF.BIP$mat$Productos),"2017"])%*%
-                t(cumprod(as.numeric(CPI.Argentina)))*
-                DF.BIP$mat[match(Product.Retail, DF.BIP$mat$Productos),paste0("",2017:2021)]/1000000)
+    input$inflation })
     
-    Sales <- data.frame(Segment = c("RP","BIP","ASS"),
-                        Sales =   c(RP.TotalSales[paste0("",input$month)],
-                                    DF.BIP$mat[match("Total Sales",DF.BIP$mat$Productos),paste0("",input$month)],
-                                    DF.AGRO$mat[match("Total Sales",DF.AGRO$mat$Productos),paste0("",input$month)]))
+    if(input$Default == TRUE) {
+      CPI.Argentina[input$month] <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),input$month])}
+      else { CPI.Argentina[input$month] <- (1+Value()) }
+     
+        RP.TotalSales <- colSums(as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2017"])%*%
+                          t(cumprod(as.numeric(CPI.Argentina)))*
+                          DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2017:2021)]/1000000)
+        
+        AG.TotalSales <- colSums(as.numeric(DF.AGRO$mat[match(paste0("Average Price - ",Product.Retail), DF.AGRO$mat$Productos),"2017"])%*%
+                         t(cumprod(as.numeric(CPI.Argentina)))*
+                         DF.AGRO$mat[match(Product.Retail, DF.AGRO$mat$Productos),paste0("",2017:2021)]/1000000)
+        BIP.TotalSales <-   colSums(as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.Retail), DF.BIP$mat$Productos),"2017"])%*%
+                            t(cumprod(as.numeric(CPI.Argentina)))*
+                            DF.BIP$mat[match(Product.Retail, DF.BIP$mat$Productos),paste0("",2017:2021)]/1000000)
+                
+        Sales <- data.frame(Segment = c("RP","BIP","ASSS"),
+                            Sales =   c(RP.TotalSales[paste0("",input$month)],
+                                        DF.BIP$mat[match("Total Sales",DF.BIP$mat$Productos),paste0("",input$month)],
+                                        DF.AGRO$mat[match("Total Sales",DF.AGRO$mat$Productos),paste0("",input$month)]))
 
     plot_ly(Sales, labels = ~Segment, values = ~Sales, type = 'pie',
-            textposition = 'inside',
-            textinfo = 'label+percent',
-            insidetextfont = list(color = '#FFFFFF'),
-            hoverinfo = 'text',
-            text = ~paste('$', round(Sales,1), ' millions'),
-            marker = list(colors = colors,
-                          line = list(color = '#FFFFFF', width = 1)),
-            #The 'pull' attribute can also be used to create space between the sectors
-            showlegend = FALSE) %>%
-      layout(title = paste('Sales by Segment -', paste0("",input$month)),
-             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE)) %>% 
-            layout(plot_bgcolor='transparent') %>% 
-            layout(paper_bgcolor='transparent') 
+              textposition = 'inside',
+              textinfo = 'label+percent',
+              insidetextfont = list(color = '#FFFFFF'),
+              hoverinfo = 'text',
+              text = ~paste('$', round(Sales,1), ' Millions'),
+              marker = list(colors = colors,
+                            line = list(color = '#FFFFFF', width = 1)),
+              #The 'pull' attribute can also be used to create space between the sectors
+              showlegend = FALSE) %>%
+              layout(title = paste('Sales by Segment -', paste0("",input$month)),
+              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE)) %>% 
+              layout(plot_bgcolor='transparent') %>% 
+              layout(paper_bgcolor='transparent') 
 
 
 
@@ -844,11 +852,11 @@ if (USER$Logged == TRUE) {
       CPI.Argentina[input$month] <- (1+Value()) }
     
     RP.COGS <-  -colSums((as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2017"])%*%
-                t(cumprod(as.numeric(CPI.Argentina))))*(1-DF.Retail$mat[match(paste0("Average Margins - ",Product.Retail),
-                DF.Retail$mat$Productos),paste0("",2017:2021)])*
-                DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2017:2021)]/1000000)  
+                  t(cumprod(as.numeric(CPI.Argentina))))*(1-DF.Retail$mat[match(paste0("Average Margins - ",Product.Retail),
+                  DF.Retail$mat$Productos),paste0("",2017:2021)])*
+                  DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2017:2021)]/1000000)  
     
-    Cogs <- data.frame(Segment = c("RP", "BIP","ASS"),
+    Cogs <- data.frame(Segment = c("RP", "BIP","ASSS"),
                        Cogs =   -c(RP.COGS[input$month],
                                    DF.BIP$mat[match("COGS",DF.BIP$mat$Productos),paste0("",input$month)],
                                    DF.AGRO$mat[match("COGS",DF.AGRO$mat$Productos),paste0("",input$month)]))
@@ -858,7 +866,7 @@ if (USER$Logged == TRUE) {
             textinfo = 'label+percent',
             insidetextfont = list(color = '#FFFFFF'),
             hoverinfo = 'text',
-            text = ~paste('$', round(Cogs,1), ' billions'),
+            text = ~paste('$', round(Cogs,1), ' Millions'),
             marker = list(colors = colors,
                           line = list(color = '#FFFFFF', width = 1)),
             #The 'pull' attribute can also be used to create space between the sectors
@@ -907,7 +915,7 @@ if (USER$Logged == TRUE) {
                             DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),"2017"]*cumprod((CPI.Argentina)) +
                             DF.Retail$mat[match("Other Income, Net", DF.Retail$mat$Productos),"2017"]*cumprod((CPI.Argentina)) 
     
-    Ebitda <- data.frame(Segment = c("RP", "BIP","ASS"),
+    Ebitda <- data.frame(Segment = c("RP", "BIP","ASSS"),
                          Ebitda = c(as.numeric(RP.EBITDA[paste0("",input$month)]),
                                    DF.BIP$mat[match("Reported Adjusted Segment EBITDA",DF.BIP$mat$Productos),paste0("",input$month)],
                                    DF.AGRO$mat[match("Reported Adjusted Segment EBITDA",DF.AGRO$mat$Productos),paste0("",input$month)]))
@@ -917,7 +925,7 @@ if (USER$Logged == TRUE) {
             textinfo = 'label+percent',
             insidetextfont = list(color = '#FFFFFF'),
             hoverinfo = 'text',
-            text = ~paste('$', round(Ebitda,1), ' billions'),
+            text = ~paste('$', round(Ebitda,1), ' Millions'),
             marker = list(colors = colors,
                           line = list(color = '#FFFFFF', width = 1)),
             #The 'pull' attribute can also be used to create space between the sectors
@@ -974,8 +982,8 @@ if (USER$Logged == TRUE) {
     
     RP.EBITDA.MARGIN <- RP.EBITDA/RP.TotalSales
     
-    Ebitda.Margin <- data.frame(Segment = c("RP", "BIP","ASS"),
-                                Ebitda.Margin =    c(as.numeric(RP.EBITDA.MARGIN[paste0("",input$month)]),
+    Ebitda.Margin <- data.frame(Segment = c("RP", "BIP","ASSS"),
+                                   Ebitda.Margin =    c(as.numeric(RP.EBITDA.MARGIN[paste0("",input$month)]),
                                    DF.BIP$mat[match("EBITDA Margin (%)",DF.BIP$mat$Productos),paste0("",input$month)],
                                    DF.AGRO$mat[match("EBITDA Margin (%)",DF.AGRO$mat$Productos),paste0("",input$month)]))
     
@@ -984,7 +992,7 @@ if (USER$Logged == TRUE) {
             textinfo = 'label+percent',
             insidetextfont = list(color = '#FFFFFF'),
             hoverinfo = 'text',
-            text = ~paste('$', round(Ebitda.Margin,1), ' billions'),
+            text = ~paste('$', round(Ebitda.Margin,1), ' Millions'),
             marker = list(colors = colors,
                           line = list(color = '#FFFFFF', width = 1)),
             #The 'pull' attribute can also be used to create space between the sectors
@@ -1012,25 +1020,27 @@ if (USER$Logged == TRUE) {
         CPI.Argentina[input$month] <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),input$month])     }
       else {
         CPI.Argentina[input$month] <- (1+Value()) }
-      RP.TotalSales <-
-        colSums(as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2017"])%*%
-                  t(cumprod(as.numeric(CPI.Argentina)))*
-                  DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2017:2021)]/1000000)
       
-    Sales2021 <- as.numeric(  RP.TotalSales[input$month]  +
-                                 DF.BIP$mat[match("Total Sales",DF.BIP$mat$Productos),input$month] +
-                                 DF.AGRO$mat[match("Total Sales",DF.AGRO$mat$Productos),input$month])
-    Year11 <- paste0("",input$month)
-    Year111 <- as.numeric(Year11) - 1 
-    Sales2021.lag <- as.numeric(DF.IS$mat[match("Total Sales",DF.IS$mat$Productos),paste0("",Year111)])
+      
+       RP.TotalSales <- colSums(as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2017"])%*%
+                       t(cumprod(as.numeric(CPI.Argentina)))*
+                        DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2017:2021)]/1000000)
+      
+        Sales2021 <- as.numeric(  RP.TotalSales[input$month]  +
+                                  DF.BIP$mat[match("Total Sales",DF.BIP$mat$Productos),input$month] +
+                                  DF.AGRO$mat[match("Total Sales",DF.AGRO$mat$Productos),input$month])
+       
+         Year11 <- paste0("",input$month)
+         Year111 <- as.numeric(Year11) - 1 
+         Sales2021.lag <- as.numeric(DF.IS$mat[match("Total Sales",DF.IS$mat$Productos),paste0("",Year111)])
     
-    Icon <- ifelse(Sales2021 > Sales2021.lag,"arrow-up","arrow-down")
-    Col <- ifelse(Sales2021 > Sales2021.lag,"aqua","red")
+        Icon <- ifelse(Sales2021 > Sales2021.lag,"arrow-up","arrow-down")
+        Col <- ifelse(Sales2021 > Sales2021.lag,"aqua","red")
     
-    valueBox(value = tags$p(prettyNum(Sales2021, big.mark = ","), style = "font-size: 70%;"),
-             subtitle = paste('Last year Sales:', prettyNum(round(Sales2021.lag,2), big.mark = ",")), 
-             color = Col,
-             icon = icon(list(name = Icon, width="10px")))
+          valueBox(value = tags$p(prettyNum(Sales2021, big.mark = ","), style = "font-size: 70%;"),
+                    subtitle = paste('Last year Sales:', prettyNum(round(Sales2021.lag,2), big.mark = ",")), 
+                   color = Col,
+                   icon = icon(list(name = Icon, width="10px")))
   })
 
   output$per_day <- renderValueBox({
@@ -1045,7 +1055,7 @@ if (USER$Logged == TRUE) {
     Col <- ifelse(EBITDA > EBITDA.lag,"aqua","red")
     
     valueBox(value = tags$p(prettyNum(EBITDA, big.mark = ","), style = "font-size: 70%;"),
-             subtitle = paste('Last year EBITDA:', prettyNum(round(EBITDA.lag,2), big.mark = ",")), 
+             subtitle = paste('Last year EBITDA:', prettyNum(round(EBITDA.lag,2), big.mark = ",")),
              color = Col,
              icon = icon(list(name = Icon, width="10px")))
   })
@@ -1063,7 +1073,7 @@ if (USER$Logged == TRUE) {
     Icon <- ifelse(EBITDA.Margin > EBITDA.Margin.lag,"arrow-up","arrow-down")
     Col <- ifelse(EBITDA.Margin > EBITDA.Margin.lag,"aqua","red")
     valueBox(value = tags$p(percent(EBITDA.Margin), style = "font-size: 70%;"),
-             subtitle = paste('Last year: ', percent(EBITDA.Margin.lag)), 
+             subtitle = paste('Last year: ', percent(EBITDA.Margin.lag)),
              color = Col,
              icon = icon(list(name = Icon, width="10px")))
   })
@@ -1075,17 +1085,33 @@ if (USER$Logged == TRUE) {
     x2 <- DF.BIP$mat[match("Total Sales",DF.BIP$mat$Productos),paste0("",2017:2021)]
     x3 <- DF.AGRO$mat[match("Total Sales",DF.AGRO$mat$Productos),paste0("",2017:2021)]
     
-    data <- data.frame(Date = y,Retail = as.numeric(x1), BIP = as.numeric(x2), Agro = as.numeric(x3))
+    data <- data.frame(Date = y,RP = as.numeric(x1), BIP = as.numeric(x2), ASSS = as.numeric(x3))
+    
+    Total.Sales <- data.frame(Sales = rowSums(data[,2:4]),
+                              Date = y)
+    
     
     top_labels <- c('RP', 'BIP', 'ASSS')
     
-    plot_ly(data, x = ~Retail, y = ~Date, type = 'bar', orientation = 'h', name = 'Retal',
+    if(input$Segment == "All") {
+      plot_ly(Total.Sales, x = ~Sales, y = ~Date, type = 'bar', orientation = 'h', name = 'TotalSales',
+              marker = list(color = 'rgba(30, 45, 23, 0.4)',
+                            line = list(color = 'rgb(245, 130, 129)', width = 1))) %>%
+        layout(plot_bgcolor='transparent') %>% 
+        layout(paper_bgcolor='transparent')  %>%
+        layout(yaxis = list(title = "Dates"), xaxis = list(title = "Total Sales (All segments)"))
+      
+    } else  {
+    
+    plot_ly(data, x = ~RP, y = ~Date, type = 'bar', orientation = 'h', name = 'Retail',
             marker = list(color = 'rgba(38, 24, 74, 0.8)',
                           line = list(color = 'rgb(248, 248, 249)', width = 1))) %>%
-      add_trace(x = ~BIP, marker = list(color = 'rgba(71, 58, 131, 0.8)'), name = 'Brand') %>%
-      add_trace(x = ~Agro, marker = list(color = 'rgba(122, 120, 168, 0.8)'), name = 'Agro') %>%
+      add_trace(x = ~BIP, marker = list(color = 'rgba(71, 58, 131, 0.8)'), name = 'BIP') %>%
+      add_trace(x = ~ASSS, marker = list(color = 'rgba(122, 120, 168, 0.8)'), name = 'ASSS') %>%
       layout(plot_bgcolor='transparent') %>% 
-      layout(paper_bgcolor='transparent') 
+      layout(paper_bgcolor='transparent')  %>%
+      layout(yaxis = list(title = "Dates"), xaxis = list(title = "Total Sales (By segment)"))
+    }
   })
   
   observeEvent(input$col, {
@@ -1095,117 +1121,303 @@ if (USER$Logged == TRUE) {
   output$Ebitdatime <- renderPlotly({
     Adjuted.Ebitda <- as.numeric(DF.IS$mat[match("Adjusted EBITDA",DF.IS$mat$Productos),paste0("",2017:2021)])/
                       as.numeric(DF.IS$mat[match("Total Sales",DF.IS$mat$Productos),paste0("",2017:2021)])
-    
     Adjuted.Ebitda <- data.frame(EBITDA = Adjuted.Ebitda,
                                  Dates = paste0("",2017:2021))
-    if(input$Segment == "all") {
-    plot_ly(
-      data = Adjuted.Ebitda,orientation = 'h', 
-      x =   ~Dates,
-      y =  ~EBITDA)  %>% 
-      layout(plot_bgcolor='transparent') %>% 
-      layout(paper_bgcolor='transparent')
-    } else if(input$Segment == "BID")  {
-      plot_ly(
-        data = Adjuted.Ebitda, 
-        x =   ~Dates,
-        y =  ~EBITDA)  %>% 
-        layout(plot_bgcolor='transparent') %>% 
-        layout(paper_bgcolor='transparent')
     
-    } else {
-      plot_ly(
-        data = Adjuted.Ebitda, 
-        x =   ~Dates,
-        y =  ~EBITDA)  %>% 
-        layout(plot_bgcolor='blue') %>% 
-        layout(paper_bgcolor='transparent')
-      }
-  })
+    y <- paste0("", 2017:2021)
+    x1 <- DF.Retail$mat[match("EBITDA Margin (%)",DF.Retail$mat$Productos),paste0("",2017:2021)]
+    x2 <- DF.BIP$mat[match("EBITDA Margin (%)",DF.BIP$mat$Productos),paste0("",2017:2021)]
+    x3 <- DF.AGRO$mat[match("EBITDA Margin (%)",DF.AGRO$mat$Productos),paste0("",2017:2021)]
+    data1 <- data.frame(Dates = y,  ASSS = as.numeric(x3), BIP = as.numeric(x2), RP = as.numeric(x1))
+    
+    
+    
+    if(input$Segment == "All") {
+      plot_ly(Adjuted.Ebitda, x = ~EBITDA, y = ~Dates, type = 'bar', orientation = 'h', name = 'Total',
+              marker = list(color = 'rgba(30, 45, 23, 0.4)',
+                            line = list(color = 'rgb(245, 130, 129)', width = 1))) %>%
+        layout(plot_bgcolor='transparent') %>% 
+        layout(paper_bgcolor='transparent')  %>%
+        layout(yaxis = list(title = "Dates"), xaxis = list(title = "Total Sales (All segments)"))
+        
+    } else  {
+      plot_ly(data1, x = ~ASSS, y = ~Dates, type = 'bar', orientation = 'h', name = 'ASSS',
+              marker = list(color = 'rgba(38, 24, 74, 0.8)',
+                            line = list(color = 'rgb(248, 248, 249)', width = 1))) %>%
+        add_trace(x = ~BIP, marker = list(color = 'rgba(71, 58, 131, 0.8)'), name = 'BIP') %>%
+        add_trace(x = ~RP, marker = list(color = 'rgba(122, 120, 168, 0.8)'), name = 'RP') %>%
+        layout(plot_bgcolor='transparent') %>% 
+        layout(paper_bgcolor='transparent')  %>%
+        layout(yaxis = list(title = "Dates"), xaxis = list(title = "Total Sales (By segment)"))
+    
+    }
+})
   
-  output$total_flights1 <- renderValueBox({
-    # The following code runs inside the databas
-    Target <- Value$mat[which(Value$mat$Variables == "Target Leverage Ratio (Debt to EBITDA)"), paste0("",2018)]
-    valueBox(subtitle = "Target Leverage Ratio",
-             value = tags$p(paste0(Target, "x"), style = "font-size: 70%;"),
+  
+  output$WACC <- renderPlotly({
+    
+    RF  <- input$RFreeR
+    CRP <- input$CRiskP
+    ERP <- Value$mat[which(Value$mat$Variables == "Equity Risk Premium"),2] 
+    Beta <- input$Beta
+    
+    Value$mat[which(Value$mat$Variables == "Cost of Capital"),2] <- RF + CRP + ERP*Beta
+    
+    Cost_Capital <- RF+CRP+ERP*Beta
+    Cost_Debt <- Value$mat[which(Value$mat$Variables == "Cost of Debt"),2]
+    
+    Deb.EVRatio <- Value$mat[max(which(Value$mat$Variables == "Debt / EV Ratio")),2]
+    
+    Value$mat[max(which(Value$mat$Variables == "WACC")),2] <- Cost_Debt*Deb.EVRatio*(1-0.35) + Cost_Capital*(1-Deb.EVRatio)
+    WACC <- Value$mat[max(which(Value$mat$Variables == "WACC")),2]                                                
+    WACC_Summary <- data.frame(Rates = (c(RF, CRP, ERP, Cost_Capital, Cost_Debt, WACC)),
+                               Names = c("Risk Free" , "Country Premium", "Equity Premium",
+                                         "Cost of Capital", "Cost of Debt", "WACC"))
+    Perpetual <- Value$mat[which(Value$mat$Variables == "Perpetual Growth Rate"),2]
+    Factor_Descuento <- (1/(1+WACC))^(1:4)
+    FCF_Descontado <- sum(Factor_Descuento*
+                            Value$mat[max(which(Value$mat$Variables == "FCF")),paste0("",2018:2021)])
+    Final_Value <- Value$mat[max(which(Value$mat$Variables == "FCF")),
+                             paste0("",2022)]/(WACC - Perpetual)
+    Final_Value <- Final_Value*last(Factor_Descuento)
+    Enter_Value <- Final_Value + FCF_Descontado
+    EBITDA_USD <- DF.IS$mat[match("Adjusted EBITDA",DF.IS$mat$Productos),paste0("",2018)]/
+                   DF1$mat[match("ARS/USD (Avg)",DF1$mat$Variables),paste0("",2018)]
+    
+    
+    clarity <- data.frame(ggplot2::diamonds)[21:26,4]
+    
+    f <- list(
+      family = "Arial Black, monospace",
+      size = 20,
+      color = "#7f7f7f")
+    
+    plot_ly(WACC_Summary, x = ~Names, y = ~Rates, type = 'bar', color = clarity) %>%
+      layout(xaxis = list(title = "WACC Components", titlefont = f, categoryarray = ~Names, categoryorder = "array"), showlegend = FALSE,
+             yaxis = list(tickformat = "%"))   %>%
+          layout(plot_bgcolor='transparent') %>% 
+          layout(paper_bgcolor='transparent') 
+        
+  })  
+  
+ output$EVEBITDA <- renderValueBox({
+   RF  <- input$RFreeR
+   CRP <- input$CRiskP
+   ERP <- Value$mat[which(Value$mat$Variables == "Equity Risk Premium"),2] 
+   Beta <- input$Beta
+   
+   Value$mat[which(Value$mat$Variables == "Cost of Capital"),2] <- RF + CRP + ERP*Beta
+   
+   Cost_Capital <- RF+CRP+ERP*Beta
+   Cost_Debt <- Value$mat[which(Value$mat$Variables == "Cost of Debt"),2]
+   
+   Deb.EVRatio <- Value$mat[max(which(Value$mat$Variables == "Debt / EV Ratio")),2]
+   
+   Value$mat[max(which(Value$mat$Variables == "WACC")),2] <- Cost_Debt*Deb.EVRatio*(1-0.35) + Cost_Capital*(1-Deb.EVRatio)
+   WACC <- Value$mat[max(which(Value$mat$Variables == "WACC")),2]                                                
+   WACC_Summary <- data.frame(Rates = (c(RF, CRP, ERP, Cost_Capital, Cost_Debt, WACC)),
+                              Names = c("Risk Free" , "Country Premium", "Equity Premium",
+                                        "Cost of Capital", "Cost of Debt", "WACC"))
+   Perpetual <- Value$mat[which(Value$mat$Variables == "Perpetual Growth Rate"),2]
+   Factor_Descuento <- (1/(1+WACC))^(1:4)
+   FCF_Descontado <- sum(Factor_Descuento*
+                           Value$mat[max(which(Value$mat$Variables == "FCF")),paste0("",2018:2021)])
+   Final_Value <- Value$mat[max(which(Value$mat$Variables == "FCF")),
+                            paste0("",2022)]/(WACC - Perpetual)
+   Final_Value <- Final_Value*last(Factor_Descuento)
+   Enter_Value <- Final_Value + FCF_Descontado
+   EBITDA_USD <- DF.IS$mat[match("Adjusted EBITDA",DF.IS$mat$Productos),paste0("",2018)]/
+     DF1$mat[match("ARS/USD (Avg)",DF1$mat$Variables),paste0("",2018)]
+   Target <- round(Enter_Value/EBITDA_USD,2)
+    valueBox(value = tags$p(paste0(Target, "x"), style = "font-size: 70%;"),
+             subtitle = "EV/EBITDA Multiple",
              color = "blue",
              icon = icon(list(name = "university", width="10px")))
   })
-  
-  output$ebitda1 <- renderValueBox({
-    # The following code runs inside the databas
-    WACC <-  Value$mat[which(Value$mat$Variables == "WACC"), paste0("",2018)] 
-    WACC <- WACC[-1]
-    valueBox(value = tags$p(percent(WACC), style = "font-size: 70%;"),
-             subtitle = "Weighted Average Cost of Capital", 
-             color = "blue",
+  output$DEBEV <- renderValueBox({
+    RF  <- input$RFreeR
+    CRP <- input$CRiskP
+    ERP <- Value$mat[which(Value$mat$Variables == "Equity Risk Premium"),2] 
+    Beta <- input$Beta
+    
+    Value$mat[which(Value$mat$Variables == "Cost of Capital"),2] <- RF + CRP + ERP*Beta
+    
+    Cost_Capital <- RF+CRP+ERP*Beta
+    Cost_Debt <- Value$mat[which(Value$mat$Variables == "Cost of Debt"),2]
+    
+    Deb.EVRatio <- Value$mat[max(which(Value$mat$Variables == "Debt / EV Ratio")),2]
+    
+    Value$mat[max(which(Value$mat$Variables == "WACC")),2] <- Cost_Debt*Deb.EVRatio*(1-0.35) + Cost_Capital*(1-Deb.EVRatio)
+    WACC <- Value$mat[max(which(Value$mat$Variables == "WACC")),2]                                                
+    WACC_Summary <- data.frame(Rates = (c(RF, CRP, ERP, Cost_Capital, Cost_Debt, WACC)),
+                               Names = c("Risk Free" , "Country Premium", "Equity Premium",
+                                         "Cost of Capital", "Cost of Debt", "WACC"))
+    Perpetual <- Value$mat[which(Value$mat$Variables == "Perpetual Growth Rate"),2]
+    Factor_Descuento <- (1/(1+WACC))^(1:4)
+    FCF_Descontado <- sum(Factor_Descuento*
+                            Value$mat[max(which(Value$mat$Variables == "FCF")),paste0("",2018:2021)])
+    Final_Value <- Value$mat[max(which(Value$mat$Variables == "FCF")),
+                             paste0("",2022)]/(WACC - Perpetual)
+    Final_Value <- Final_Value*last(Factor_Descuento)
+    Enter_Value <- Final_Value + FCF_Descontado
+    EBITDA_USD <- DF.IS$mat[match("Adjusted EBITDA",DF.IS$mat$Productos),paste0("",2018)]/
+      DF1$mat[match("ARS/USD (Avg)",DF1$mat$Variables),paste0("",2018)]
+    
+    Target <-  EBITDA_USD*Value$mat[which(Value$mat$Variables == "Target Leverage Ratio (Debt to EBITDA)"),
+                                    paste0("",2018)]/Enter_Value
+    Target <- round(Target,2)
+    valueBox(value = tags$p(percent(Target), style = "font-size: 70%;"),
+             subtitle = "Debt / EV Ratio",
+             color = "green",
              icon = icon(list(name = "percent", width="10px")))
   })
   
-  output$ebitdapct1 <- renderValueBox({
-    # The following code runs inside the databas
-  EV <- Value$mat[which(Value$mat$Variables == "EV"), paste0("",2018)]
-    valueBox(value = tags$p(round(EV,2), style = "font-size: 70%;"),
-              subtitle = "Enterprise Value",
+  output$Beta <- renderValueBox({
+    RF  <- input$RFreeR
+    CRP <- input$CRiskP
+    ERP <- Value$mat[which(Value$mat$Variables == "Equity Risk Premium"),2] 
+    Beta <- input$Beta
+    
+    Value$mat[which(Value$mat$Variables == "Cost of Capital"),2] <- RF + CRP + ERP*Beta
+    
+    Cost_Capital <- RF+CRP+ERP*Beta
+    Cost_Debt <- Value$mat[which(Value$mat$Variables == "Cost of Debt"),2]
+    
+    Deb.EVRatio <- Value$mat[max(which(Value$mat$Variables == "Debt / EV Ratio")),2]
+    
+    Value$mat[max(which(Value$mat$Variables == "WACC")),2] <- Cost_Debt*Deb.EVRatio*(1-0.35) + Cost_Capital*(1-Deb.EVRatio)
+    WACC <- Value$mat[max(which(Value$mat$Variables == "WACC")),2]                                                
+    WACC_Summary <- data.frame(Rates = (c(RF, CRP, ERP, Cost_Capital, Cost_Debt, WACC)),
+                               Names = c("Risk Free" , "Country Premium", "Equity Premium",
+                                         "Cost of Capital", "Cost of Debt", "WACC"))
+    Perpetual <- Value$mat[which(Value$mat$Variables == "Perpetual Growth Rate"),2]
+    Factor_Descuento <- (1/(1+WACC))^(1:4)
+    FCF_Descontado <- sum(Factor_Descuento*
+                            Value$mat[max(which(Value$mat$Variables == "FCF")),paste0("",2018:2021)])
+    Final_Value <- Value$mat[max(which(Value$mat$Variables == "FCF")),
+                             paste0("",2022)]/(WACC - Perpetual)
+    Final_Value <- Final_Value*last(Factor_Descuento)
+    Enter_Value <- Final_Value + FCF_Descontado
+    EBITDA_USD <- DF.IS$mat[match("Adjusted EBITDA",DF.IS$mat$Productos),paste0("",2018)]/
+      DF1$mat[match("ARS/USD (Avg)",DF1$mat$Variables),paste0("",2018)]
+    Beta <- input$Beta
+    valueBox(value = tags$p(round(Beta,2), style = "font-size: 70%;"),
+             subtitle = "Company Beta",
              color = "blue",
              icon = icon(list(name = "dollar-sign", width="10px")))
   })
-
   
   
-  output$ebitdatime1 <- renderValueBox({
-    # The following code runs inside the databas
-    Target <- Value$mat[which(Value$mat$Variables == "Target Leverage Ratio (Debt to EBITDA)"), paste0("",2018)]
-    valueBox(subtitle = "Target Leverage Ratio",
-             value = tags$p(paste0(Target, "x"), style = "font-size: 70%;"),
+  
+  output$PRICEPER <- renderValueBox({
+    RF  <- input$RFreeR
+    CRP <- input$CRiskP
+    ERP <- Value$mat[which(Value$mat$Variables == "Equity Risk Premium"),2] 
+    Beta <- input$Beta
+    
+    Value$mat[which(Value$mat$Variables == "Cost of Capital"),2] <- RF + CRP + ERP*Beta
+    
+    Cost_Capital <- RF+CRP+ERP*Beta
+    Cost_Debt <- Value$mat[which(Value$mat$Variables == "Cost of Debt"),2]
+    
+    Deb.EVRatio <- Value$mat[max(which(Value$mat$Variables == "Debt / EV Ratio")),2]
+    
+    Value$mat[max(which(Value$mat$Variables == "WACC")),2] <- Cost_Debt*Deb.EVRatio*(1-0.35) + Cost_Capital*(1-Deb.EVRatio)
+    WACC <- Value$mat[max(which(Value$mat$Variables == "WACC")),2]                                                
+    WACC_Summary <- data.frame(Rates = (c(RF, CRP, ERP, Cost_Capital, Cost_Debt, WACC)),
+                               Names = c("Risk Free" , "Country Premium", "Equity Premium",
+                                         "Cost of Capital", "Cost of Debt", "WACC"))
+    Perpetual <- Value$mat[which(Value$mat$Variables == "Perpetual Growth Rate"),2]
+    Factor_Descuento <- (1/(1+WACC))^(1:4)
+    FCF_Descontado <- sum(Factor_Descuento*
+                            Value$mat[max(which(Value$mat$Variables == "FCF")),paste0("",2018:2021)])
+    Final_Value <- Value$mat[max(which(Value$mat$Variables == "FCF")),
+                             paste0("",2022)]/(WACC - Perpetual)
+    Final_Value <- Final_Value*last(Factor_Descuento)
+    Enter_Value <- Final_Value + FCF_Descontado
+    EBITDA_USD <- DF.IS$mat[match("Adjusted EBITDA",DF.IS$mat$Productos),paste0("",2018)]/
+      DF1$mat[match("ARS/USD (Avg)",DF1$mat$Variables),paste0("",2018)]
+    Debt <- (-DF.BS$mat[match("Cash and cash equivalents",DF.BS$mat$Productos),paste0("",2018)]/ +
+              DF.BS$mat[match("Borrowings",DF.BS$mat$Productos),paste0("",2018)] + 
+              DF.BS$mat[match("Borrowings1",DF.BS$mat$Productos),paste0("",2018)])/
+             DF1$mat[match("ARS/USD (EOP)",DF1$mat$Variables),paste0("",2018)]
+    
+    Target <- (Enter_Value - Debt)/
+              Value$mat[which(Value$mat$Variables == "New Shares"),paste0("",2018)]
+    Target <- round(Target*(1-0.20),2)
+    valueBox(value = tags$p(paste(Target, "USD"), style = "font-size: 70%;"),
+             subtitle = "Price per Shares",
              color = "blue",
-             icon = icon(list(name = "university", width="10px")))
+             icon = icon(list(name = "dollar", width="10px")))
   })
-  output$Sales1 <- renderValueBox({
-    # The following code runs inside the databas
+  output$WACC1 <- renderValueBox({
+    RF  <- input$RFreeR
+    CRP <- input$CRiskP
+    ERP <- Value$mat[which(Value$mat$Variables == "Equity Risk Premium"),2] 
+    Beta <- input$Beta
+    
+    Value$mat[which(Value$mat$Variables == "Cost of Capital"),2] <- RF + CRP + ERP*Beta
+    
+    Cost_Capital <- RF+CRP+ERP*Beta
+    Cost_Debt <- Value$mat[which(Value$mat$Variables == "Cost of Debt"),2]
+    
+    Deb.EVRatio <- Value$mat[max(which(Value$mat$Variables == "Debt / EV Ratio")),2]
+    
+    Value$mat[max(which(Value$mat$Variables == "WACC")),2] <- Cost_Debt*Deb.EVRatio*(1-0.35) + Cost_Capital*(1-Deb.EVRatio)
+    WACC <- Value$mat[max(which(Value$mat$Variables == "WACC")),2]                                                
+    WACC_Summary <- data.frame(Rates = (c(RF, CRP, ERP, Cost_Capital, Cost_Debt, WACC)),
+                               Names = c("Risk Free" , "Country Premium", "Equity Premium",
+                                         "Cost of Capital", "Cost of Debt", "WACC"))
+    Perpetual <- Value$mat[which(Value$mat$Variables == "Perpetual Growth Rate"),2]
+    Factor_Descuento <- (1/(1+WACC))^(1:4)
+    FCF_Descontado <- sum(Factor_Descuento*
+                            Value$mat[max(which(Value$mat$Variables == "FCF")),paste0("",2018:2021)])
+    Final_Value <- Value$mat[max(which(Value$mat$Variables == "FCF")),
+                             paste0("",2022)]/(WACC - Perpetual)
+    Final_Value <- Final_Value*last(Factor_Descuento)
+    Enter_Value <- Final_Value + FCF_Descontado
+    EBITDA_USD <- DF.IS$mat[match("Adjusted EBITDA",DF.IS$mat$Productos),paste0("",2018)]/
+      DF1$mat[match("ARS/USD (Avg)",DF1$mat$Variables),paste0("",2018)]
     WACC <-  Value$mat[which(Value$mat$Variables == "WACC"), paste0("",2018)] 
     WACC <- WACC[-1]
     valueBox(value = tags$p(percent(WACC), style = "font-size: 70%;"),
-             subtitle = "Weighted Average Cost of Capital", 
+             subtitle = "Weighted Average Cost of Capital",
              color = "blue",
              icon = icon(list(name = "percent", width="10px")))
   })
   
-  output$Cogs1 <- renderValueBox({
-    # The following code runs inside the databas
-    EV <- Value$mat[which(Value$mat$Variables == "EV"), paste0("",2018)]
+  output$EV1 <- renderValueBox({
+    RF  <- input$RFreeR
+    CRP <- input$CRiskP
+    ERP <- Value$mat[which(Value$mat$Variables == "Equity Risk Premium"),2] 
+    Beta <- input$Beta
+    
+    Value$mat[which(Value$mat$Variables == "Cost of Capital"),2] <- RF + CRP + ERP*Beta
+    
+    Cost_Capital <- RF+CRP+ERP*Beta
+    Cost_Debt <- Value$mat[which(Value$mat$Variables == "Cost of Debt"),2]
+    
+    Deb.EVRatio <- Value$mat[max(which(Value$mat$Variables == "Debt / EV Ratio")),2]
+    
+    Value$mat[max(which(Value$mat$Variables == "WACC")),2] <- Cost_Debt*Deb.EVRatio*(1-0.35) + Cost_Capital*(1-Deb.EVRatio)
+    WACC <- Value$mat[max(which(Value$mat$Variables == "WACC")),2]                                                
+    WACC_Summary <- data.frame(Rates = (c(RF, CRP, ERP, Cost_Capital, Cost_Debt, WACC)),
+                               Names = c("Risk Free" , "Country Premium", "Equity Premium",
+                                         "Cost of Capital", "Cost of Debt", "WACC"))
+    Perpetual <- Value$mat[which(Value$mat$Variables == "Perpetual Growth Rate"),2]
+    Factor_Descuento <- (1/(1+WACC))^(1:4)
+    FCF_Descontado <- sum(Factor_Descuento*
+                            Value$mat[max(which(Value$mat$Variables == "FCF")),paste0("",2018:2021)])
+    Final_Value <- Value$mat[max(which(Value$mat$Variables == "FCF")),
+                             paste0("",2022)]/(WACC - Perpetual)
+    Final_Value <- Final_Value*last(Factor_Descuento)
+    Enter_Value <- Final_Value + FCF_Descontado
+    EBITDA_USD <- DF.IS$mat[match("Adjusted EBITDA",DF.IS$mat$Productos),paste0("",2018)]/
+      DF1$mat[match("ARS/USD (Avg)",DF1$mat$Variables),paste0("",2018)]
+    EV <- Enter_Value
     valueBox(value = tags$p(round(EV,2), style = "font-size: 70%;"),
              subtitle = "Enterprise Value",
-             color = "blue",
-             icon = icon(list(name = "dollar-sign", width="10px")))
-  })
-  
-  
-  
-  output$barsplot1 <- renderValueBox({
-    # The following code runs inside the databas
-    Target <- Value$mat[which(Value$mat$Variables == "Target Leverage Ratio (Debt to EBITDA)"), paste0("",2018)]
-    valueBox(subtitle = "Target Leverage Ratio",
-             value = tags$p(paste0(Target, "x"), style = "font-size: 70%;"),
-             color = "red",
-             icon = icon(list(name = "university", width="10px")))
-  })
-  output$per_day1 <- renderValueBox({
-    # The following code runs inside the databas
-    WACC <-  Value$mat[which(Value$mat$Variables == "WACC"), paste0("",2018)] 
-    WACC <- WACC[-1]
-    valueBox(value = tags$p(percent(WACC), style = "font-size: 70%;"),
-             subtitle = "Weighted Average Cost of Capital", 
-             color = "red",
-             icon = icon(list(name = "percent", width="10px")))
-  })
-  
-  output$Ebitdapercentahe1 <- renderValueBox({
-    # The following code runs inside the databas
-    EV <- Value$mat[which(Value$mat$Variables == "EV"), paste0("",2018)]
-    valueBox(value = tags$p(round(EV,2), style = "font-size: 70%;"),
-             subtitle = "Enterprise Value",
-             color = "red",
+             color = "green",
              icon = icon(list(name = "dollar-sign", width="10px")))
   })
   
@@ -1253,6 +1465,7 @@ if (USER$Logged == TRUE) {
 
 
 
+
 shinyApp(ui, server)
-
-
+ 
+  
