@@ -1,3 +1,6 @@
+DATA_DIR <- file.path("data")
+Fuente <-   file.path(DATA_DIR, "Appdata.RData")
+load(Fuente)
 ui <- dashboardPage(
   dashboardHeader(title = "Probando maaaan"),
   dashboardSidebar(sidebarMenu(
