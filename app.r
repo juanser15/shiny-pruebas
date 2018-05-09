@@ -11,7 +11,7 @@ library(highcharter)
 library(htmltools)
 library(scales)
 
-#Fuente <- "C:/Users/juana/Desktop/APP MOLCA Last/Data.xlsx"
+
 DATA_DIR <- file.path("data")
 Fuente <-   file.path(DATA_DIR, "Datos.xlsx")
 tab <- data.frame(read_excel(Fuente, sheet = "Business Inputs"))
@@ -20,8 +20,8 @@ colnames(tab) <- c("Variables", gsub("X","",colnames(tab)[-1]))
 CPI.Argentina <- (1+tab[which(tab$Variables == "CPI Argentina"),paste0("",2017:2021)])
 
 
-my_username <- "Molca"
-my_password <- "Molca"
+my_username <- "NewUser"
+my_password <- "User123"
 
 
 jsCode <- ("shinyjs.pageCol = function(params){
@@ -67,7 +67,7 @@ Cell_editable <- ("function(instance, td, row, col, prop, value, cellProperties)
 options(shiny.sanitize.errors = FALSE)
 
 ui <- dashboardPage( skin='blue',
-        dashboardHeader(title = "Molino Cañuelas S.A.C.I.F.I.A",
+        dashboardHeader(title = "",
                         titleWidth = 200),
         dashboardSidebar(uiOutput("sidebarpanel")),
         dashboardBody(uiOutput("body"),
