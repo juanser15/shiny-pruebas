@@ -12,9 +12,8 @@ library(highcharter)
 library(htmltools)
 library(scales)
 
-Fuente <- "C:/Users/juana/Desktop/Molca/Datos.xlsx"
-# DATA_DIR <- file.path("data")
-# Fuente <-   file.path(DATA_DIR, "Datos.xlsx")
+DATA_DIR <- file.path("data")
+Fuente <-   file.path(DATA_DIR, "Datos.xlsx")
 tab <- data.frame(read_excel(Fuente, sheet = "Business Inputs"))
 tab <- data.frame(tab)
 colnames(tab) <- c("Variables", gsub("X","",colnames(tab)[-1])) 
