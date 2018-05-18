@@ -1,3 +1,4 @@
+library(shinycssloaders)
 library(rhandsontable)
 library(plotly)
 library(shinydashboard)
@@ -11,9 +12,9 @@ library(highcharter)
 library(htmltools)
 library(scales)
 
-#Fuente <- "C:/Users/juana/Desktop/Molca/Datos.xlsx"
- DATA_DIR <- file.path("data")
- Fuente <-   file.path(DATA_DIR, "Datos.xlsx")
+Fuente <- "C:/Users/juana/Desktop/Molca/Datos.xlsx"
+# DATA_DIR <- file.path("data")
+# Fuente <-   file.path(DATA_DIR, "Datos.xlsx")
 tab <- data.frame(read_excel(Fuente, sheet = "Business Inputs"))
 tab <- data.frame(tab)
 colnames(tab) <- c("Variables", gsub("X","",colnames(tab)[-1])) 
@@ -64,7 +65,7 @@ Cell_editable <- ("function(instance, td, row, col, prop, value, cellProperties)
                   if (tbl.params.Row_numbers.includes(row)) td.style.background = 'lightblue';
                   }")
 
-options(shiny.sanitize.errors = FALSE)
+# options(shiny.sanitize.errors = FALSE)
 
 ui <- dashboardPage( skin='blue',
                      dashboardHeader(title = "Molino Cañuelas S.A.C.I.F.I.A",
@@ -165,22 +166,96 @@ ui <- dashboardPage( skin='blue',
                                                  )
                                                ),
                                                
+                                               # tabPanel(
+                                               #   title = "Tables",
+                                               #   tabPanel('Financial Statements', tabsetPanel(tabPanel("Balance Sheet", rHandsontableOutput('BS')),
+                                               #                                                tabPanel("Income Statement", rHandsontableOutput('IS')),
+                                               #                                                tabPanel("Cash Flows", rHandsontableOutput('CF')))),
+                                               #   tabPanel('By segment', tabsetPanel(tabPanel("Retail Products", rHandsontableOutput('RP')),
+                                               #                                      tabPanel("Branded Industrial Products", rHandsontableOutput('BIP')),
+                                               #                                      tabPanel("Agro Services", rHandsontableOutput('AGRO')))),
+                                               #   tabPanel('Inputs', tabsetPanel(tabPanel("Production Inputs", rHandsontableOutput('tabEdit2')),
+                                               #                                  tabPanel("Business Inputs", rHandsontableOutput('tabEdit1'))))
+                                               # ),
                                                tabPanel(
-                                                 title = "Tables",
-                                                 tabPanel('Financial Statements', tabsetPanel(tabPanel("Balance Sheet", rHandsontableOutput('BS')),
-                                                                                              tabPanel("Income Statement", rHandsontableOutput('IS')),
-                                                                                              tabPanel("Cash Flows", rHandsontableOutput('CF')))),
-                                                 tabPanel('By segment', tabsetPanel(tabPanel("Retail Products", rHandsontableOutput('RP')),
-                                                                                    tabPanel("Branded Industrial Products", rHandsontableOutput('BIP')),
-                                                                                    tabPanel("Agro Services", rHandsontableOutput('AGRO')))),
-                                                 tabPanel('Inputs', tabsetPanel(tabPanel("Production Inputs", rHandsontableOutput('tabEdit2')),
-                                                                                tabPanel("Business Inputs", rHandsontableOutput('tabEdit1'))))
-                                               )  
-                                   )
+                                                 title = "Inputs panel",
+                                                 value = "page11",
+                                                 # Sidebar panel for inputs ----
+                                                 fluidRow( 
+                                                   sidebarPanel(
+                                                       sliderInput("Activity2019",
+                                                                   "Economic Growth 2019:",
+                                                                   value = tab[which(tab == "CPI Argentina"), "2019"],
+                                                                   min = 0.032,
+                                                                   step = 0.001, 
+                                                                   max = 0.10),
+                                                       sliderInput("Activity2020",
+                                                                   "Economic Growth 2020:",
+                                                                   value = tab[which(tab == "CPI Argentina"), "2020"],
+                                                                   min = 0.031,
+                                                                   step = 0.001, 
+                                                                   max = 0.10),
+                                                       sliderInput("Activity2021",
+                                                                   "Economic Growth 2021:",
+                                                                   value = tab[which(tab == "CPI Argentina"), "2021"],
+                                                                   min = 0.032,
+                                                                   step = 0.001, 
+                                                                   max = 0.10)
+                                                     ),
+                                                   fluidRow( 
+                                                     sidebarPanel(
+                                                       sliderInput("CPI.USA2019",
+                                                                   "CPI USA 2019:",
+                                                                   value = 0.03,
+                                                                   min = 0,
+                                                                   step = 0.001, 
+                                                                   max = 0.05),
+                                                       sliderInput("CPI.USA2020",
+                                                                   "CPI USA 2020:",
+                                                                   value = 0.03,
+                                                                   min = 0,
+                                                                   step = 0.001, 
+                                                                   max = 0.05),
+                                                       sliderInput("CPI.USA2021",
+                                                                   "CPI USA 2021:",
+                                                                   value = 0.03,
+                                                                   min = 0,
+                                                                   step = 0.001, 
+                                                                   max = 0.05)
+                                                     ),
+                                                 fluidRow( 
+                                                   sidebarPanel(
+                                                 sliderInput("inflation2019",
+                                                             "Inflation 2019:",
+                                                             value = 0.15,
+                                                             min = 0,
+                                                             step = 0.01, 
+                                                             max = 0.5),
+                                                 sliderInput("inflation2020",
+                                                             "Inflation 2020:",
+                                                             value = 0.10,
+                                                             min = 0,
+                                                             step = 0.01, 
+                                                             max = 0.5),
+                                                 sliderInput("inflation2021",
+                                                             "Inflation 2021:",
+                                                             value = 0.09,
+                                                             min = 0,
+                                                             step = 0.01, 
+                                                             max = 0.5)
+                                                 )
+                                             )
+                                        )
+                                    ),
+                                    fluidRow(
+                                      plotlyOutput("Inputplot")
+                                      
+                                    )
+                               )
                      )
+                )
 )
 
-## server.R :
 
 server <- function(input, output, session) {
 
@@ -228,19 +303,18 @@ server <- function(input, output, session) {
           selectInput(inputId = "month",label = "Select year:",
                       choices =
                         list(
-                          "Año 2017" = "2017",
                           "Año 2018" = "2018",
                           "Año 2019" = "2019",
                           "Año 2020" = "2020",
                           "Año 2021" = "2021"
                         ),
-                      selected =  "2017",
+                      selected =  "2018",
                       selectize = FALSE)
         ),
-        numericInput("dollar", "Tipo de cambio:", 21, min = 1, max = 100),
-        verbatimTextOutput("value"),
-        numericInput("inflation", "CPI Argentina:", tab[which(tab == "CPI Argentina"), "2017"], min = 1, max = 100),
-        verbatimTextOutput("value1"),
+        # numericInput("dollar", "Tipo de cambio:", 21, min = 1, max = 100),
+        # verbatimTextOutput("value"),
+        # numericInput("inflation", "CPI Argentina:", tab[which(tab == "CPI Argentina"), "2017"], min = 1, max = 100),
+        # verbatimTextOutput("value1"),
         # actionButton("saveBtn", "Save changes", icon("save"), style='padding:6px; font-size:80%',
         # class = "btn btn-primary"),
         actionButton("submit1" ,"Submit changes", icon("refresh"), style='padding:6px; font-size:80%',
@@ -298,9 +372,6 @@ server <- function(input, output, session) {
         # DF1$mat[which(DF1$mat == "ARS/USD (EOP)"), input$month] <- input$inflation
         DF1$mat[3,paste0("",2018:2021)] <- MEAN
         DF1$mat[8,paste0("",2018:2021)] <- BADLAR
-
-
-
         DF1 <- DF1$mat
         # row_highlight <- c(which(DF1 == "Exchange Rates"),which(DF1 == "Inflation"),
         #                    which(DF1 == "Interest Rates"),
@@ -323,7 +394,6 @@ server <- function(input, output, session) {
           DF2$mat <- hot_to_r(input$tabEdit2)
       })
       observe({
-        nb<-input$dim
         tab <- data.frame(read_excel(Fuente, sheet = "Production Inputs"))
         tab <- data.frame(Productos = tab$Producto,
                           Ratio = tab$Ratio,
@@ -348,7 +418,7 @@ server <- function(input, output, session) {
         tab <- data.frame(read_excel(Fuente, sheet = "Retail Products"))
         tab <- data.frame(tab)
         colnames(tab) <- c("Productos", gsub("X","",colnames(tab)[-1]))
-        DF.Retail$mat<-tab
+        DF.Retail$mat <- tab
       })
       output$RP <- renderRHandsontable({
 
@@ -384,9 +454,9 @@ server <- function(input, output, session) {
           colSums(DF.Retail$mat[min(which(DF.Retail$mat$Productos == "Flour Products")):
                                   min(which(DF.Retail$mat$Productos == "Frozen Products")),paste0("",2018:2021)])
         #Average Prices  --------------------------------------------------------------
-        DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2018:2021)] <-
-          as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2017"])%*%
-          t(cumprod(as.numeric(CPI.Argentina)))
+        DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2019:2021)] <-
+          as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2018"])%*%
+          t(cumprod(as.numeric(CPI.Argentina[,paste0("",2019:2021)])))
         #Sales  --------------------------------------------------------------
         DF.Retail$mat[match(paste0("Sales - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2018:2021)] <-
           DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2018:2021)]*
@@ -396,12 +466,12 @@ server <- function(input, output, session) {
         #Total Sales  --------------------------------------------------------------
         DF.Retail$mat[match("Total Sales", DF.Retail$mat$Productos),paste0("",2018:2021)] <-
           colSums(DF.Retail$mat[match(paste0("Sales - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2018:2021)])
-        #Total Sales  --------------------------------------------------------------
+        #COGS  --------------------------------------------------------------
         DF.Retail$mat[match("COGS",DF.Retail$mat$Productos),paste0("",2018:2021)] <-
           -colSums(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2018:2021)]*(1-
                     DF.Retail$mat[match(paste0("Average Margins - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2018:2021)])*
                      DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2018:2021)]/1000000)
-
+        DF.Retail$mat[match("COGS",DF.Retail$mat$Productos),paste0("",2018)] <- sum(DF.Retail$mat[match("COGS",DF.Retail$mat$Productos),c("9M2018","4Q2018")])
         #Gross Margin  --------------------------------------------------------------
         DF.Retail$mat[match("Gross Margin",DF.Retail$mat$Productos),paste0("",2018:2021)] <-
           DF.Retail$mat[match("Total Sales",DF.Retail$mat$Productos),paste0("",2018:2021)] +
@@ -413,32 +483,36 @@ server <- function(input, output, session) {
           DF.Retail$mat[match("Total Sales", DF.Retail$mat$Productos),paste0("",2018:2021)]
         #Selling and Administrative Costs --------------------------------------------------------------
         Vol.Change.Retail <- DF.Retail$mat[max(which(DF.Retail$mat$Productos == "Total Volume")),paste0("",2017:2021)][-1]/
-          DF.Retail$mat[max(which(DF.Retail$mat$Productos == "Total Volume")),paste0("",2017:2021)][-length(2017:2021)]-1
+          DF.Retail$mat[max(which(DF.Retail$mat$Productos == "Total Volume")),paste0("",2017:2021)][-length(2017:2021)]-1 #Pass-Through Inflation -> Volume Growth
 
-        DF.Retail$mat[match("Selling Expense", DF.Retail$mat$Productos),paste0("",2018:2021)] <-
-          DF.Retail$mat[match("Selling Expense", DF.Retail$mat$Productos),"2017"]*cumprod(as.numeric(CPI.Argentina))*
-          cumprod(as.numeric(Vol.Change.Retail*0.90)+1)
-        DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),paste0("",2018:2021)] <-
-          DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),"2017"]*cumprod(as.numeric(CPI.Argentina))
-        #EBITDA and more --------------------------------------------------------------
+        DF.Retail$mat[match("Selling Expense", DF.Retail$mat$Productos),paste0("",2019:2021)] <-
+                                                                                              DF.Retail$mat[match("Selling Expense",DF.Retail$mat$Productos),"2018"]*
+                                                                                              cumprod(as.numeric(CPI.Argentina[,paste0("",2019:2021)]))*
+                                                                                              cumprod(as.numeric(Vol.Change.Retail[,paste0("",2019:2021)])+1)
+        
+        DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),paste0("",2019:2021)] <-
+          DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),"2018"]*cumprod(as.numeric(CPI.Argentina[,paste0("",2019:2021)]))
+        #EBITDA and mor e --------------------------------------------------------------
         DF.Retail$mat[match("Results from Operations Before Financing and Tax", DF.Retail$mat$Productos),paste0("",2018:2021)] <-
-          DF.Retail$mat[match("Gross Margin",DF.Retail$mat$Productos),paste0("",2018:2021)] +
-          DF.Retail$mat[match("Selling Expense", DF.Retail$mat$Productos),"2017"]*cumprod(as.numeric(CPI.Argentina))*
-          cumprod(as.numeric(Vol.Change.Retail*0.90)+1) +
-          DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),"2017"]*cumprod(as.numeric(CPI.Argentina)) +
-          DF.Retail$mat[match("Other Income, Net", DF.Retail$mat$Productos),"2017"]*cumprod(as.numeric(CPI.Argentina))
+          DF.Retail$mat[match("Gross Margin",DF.Retail$mat$Productos),paste0("",2019:2021)] +
+          DF.Retail$mat[match("Selling Expense",DF.Retail$mat$Productos),"2018"]*
+          cumprod(as.numeric(CPI.Argentina[,paste0("",2019:2021)]))*
+          cumprod(as.numeric(Vol.Change.Retail[,paste0("",2019:2021)])+1) +
+          DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),"2018"]*cumprod(as.numeric(CPI.Argentina[,paste0("",2019:2021)])) +
+          DF.Retail$mat[match("Other Income, Net", DF.Retail$mat$Productos),"2018"]
+        
 
-        DF.Retail$mat[match("Reported Adjusted Segment EBITDA", DF.Retail$mat$Productos),paste0("",2018:2021)] <-
-          DF.Retail$mat[match("Results from Operations Before Financing and Tax", DF.Retail$mat$Productos),paste0("",2018:2021)] -
-          DF.Retail$mat[match("Depreciation and Amortization",DF.Retail$mat$Productos),paste0("",2018:2021)]
+        DF.Retail$mat[match("Reported Adjusted Segment EBITDA", DF.Retail$mat$Productos),paste0("",2019:2021)] <-
+          DF.Retail$mat[match("Results from Operations Before Financing and Tax", DF.Retail$mat$Productos),paste0("",2019:2021)] -
+          DF.Retail$mat[match("Depreciation and Amortization",DF.Retail$mat$Productos),paste0("",2019:2021)]
 
 
 
 
 
-        DF.Retail$mat[match("EBITDA Margin (%)", DF.Retail$mat$Productos),paste0("",2018:2021)] <-
-          DF.Retail$mat[match("Reported Adjusted Segment EBITDA", DF.Retail$mat$Productos),paste0("",2018:2021)]/
-          DF.Retail$mat[match("Total Sales", DF.Retail$mat$Productos),paste0("",2018:2021)]
+        DF.Retail$mat[match("EBITDA Margin (%)", DF.Retail$mat$Productos),paste0("",2019:2021)] <-
+          DF.Retail$mat[match("Reported Adjusted Segment EBITDA", DF.Retail$mat$Productos),paste0("",2019:2021)]/
+          DF.Retail$mat[match("Total Sales", DF.Retail$mat$Productos),paste0("",2019:2021)]
 
         # Inserr final table   ------------------------------------------------------------
         DF.Retail <- DF.Retail$mat
@@ -453,11 +527,10 @@ server <- function(input, output, session) {
           DF.BIP$mat <- hot_to_r(input$BIP)
       })
       observe({
-        nb<-input$dim
         tab <- data.frame(read_excel(Fuente, sheet = "Branded Industrial Products"))
         tab <- data.frame(tab)
         colnames(tab) <- c("Productos", gsub("X","",colnames(tab)[-1]))
-        DF.BIP$mat<-tab
+        DF.BIP$mat <- tab
       })
       output$BIP <- renderRHandsontable({
         # Input Variables  --------------------------------------------------------------
@@ -546,7 +619,6 @@ server <- function(input, output, session) {
           DF.AGRO$mat <- hot_to_r(input$AGRO)
       })
       observe({
-        nb<-input$dim
         tab <- data.frame(read_excel(Fuente, sheet = "Agro Services "))
         tab <- data.frame(tab)
         colnames(tab) <- c("Productos", gsub("X","",colnames(tab)[-1]))
@@ -660,7 +732,6 @@ server <- function(input, output, session) {
           DF.BS$mat <- hot_to_r(input$BS)
       })
       observe({
-        nb<-input$dim
         tab <- data.frame(read_excel(Fuente, sheet = "Balance Sheet"))
         tab <- data.frame(tab)
         colnames(tab) <- c("Productos", gsub("X","",colnames(tab)[-1]))
@@ -680,7 +751,7 @@ server <- function(input, output, session) {
           DF.IS$mat <- hot_to_r(input$IS)
       })
       observe({
-        nb<-input$dim
+        
         tab <- data.frame(read_excel(Fuente, sheet = "Income Statement"))
         tab <- data.frame(tab)
         colnames(tab) <- c("Productos", gsub("X","",colnames(tab)[-1]))
@@ -812,31 +883,132 @@ server <- function(input, output, session) {
           hot_col(1,renderer = Bold_function)
       })
 
+      
+      output$Inputplot = renderPlotly({
+        Product.Retail <- c("Flour Products", "Oil", "Biscuits, Cookies and Crackers", "Bread Crumbs and Premixes (& Pasta)", "Frozen Products")
+        Product.Agro <- c("Wheat","Soybean","Corn","Others")
+        Product.BIP <- c("Wheat Flour","MRP","Soybean Flour and Co-Products","Cañuelas Pack")
+        
+        Value <-  eventReactive(input$submit1, {
+          c(input$inflation2019,input$inflation2020,input$inflation2021) })
+        
+        Value1 <-  eventReactive(input$submit1, {
+          c(input$CPI.USA2019,input$CPI.USA2020,input$CPI.USA2021) })
+        
+        Value2 <-  eventReactive(input$submit1, {
+          c(input$Activity2019,input$Activity2020,input$Activity2021) })
+        
+        if(input$Default == TRUE) {
+          CPI.Argentina <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),paste0("",2019:2021)])
+          CPI.USA <- (1+DF1$mat[which(DF1$mat$Variables == "CPI US"),paste0("",2019:2021)])
+          Economic.Growth <- (1+DF1$mat[which(DF1$mat$Variables == "Argentina"),paste0("",2019:2021)]) }
+        else { CPI.Argentina <- (1+Value())
+        CPI.USA <- (1+Value1())
+        Economic.Growth <- (1+Value2())}
+        
+        if(input$Default == TRUE) {
+          Devaluation.Argentina.EOP <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),paste0("",2019:2021)]
+          Devaluation.Argentina.AVG <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2019:2021)]}
+        else { Devaluation.Argentina.EOP <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"]*cumprod(as.numeric((CPI.Argentina/CPI.USA)))
+        Devaluation.Argentina.AVG <- (0.5*(c(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"],Devaluation.Argentina.EOP))[1:3]+
+                                               as.numeric(Devaluation.Argentina.EOP)))) }
+        
+        DEV <- data.frame(Devaluación = c(as.numeric(DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),paste0("",2014:2018)]),as.numeric(Devaluation.Argentina.EOP)),
+                          Time = 2014:2021)
+        qplot(Time, Devaluación, data=DEV) + geom_smooth(method = "glm", formula = y~x)  
+        })
+      
       output$Sales = renderPlotly({
         Product.Retail <- c("Flour Products", "Oil", "Biscuits, Cookies and Crackers", "Bread Crumbs and Premixes (& Pasta)", "Frozen Products")
-        CPI.Argentina[1] <- 1
+        Product.Agro <- c("Wheat","Soybean","Corn","Others")
+        Product.BIP <- c("Wheat Flour","MRP","Soybean Flour and Co-Products","Cañuelas Pack")
+        
         Value <-  eventReactive(input$submit1, {
-          input$inflation })
+          c(input$inflation2019,input$inflation2020,input$inflation2021) })
+        
+        Value1 <-  eventReactive(input$submit1, {
+          c(input$CPI.USA2019,input$CPI.USA2020,input$CPI.USA2021) })
+        
+        Value2 <-  eventReactive(input$submit1, {
+          c(input$Activity2019,input$Activity2020,input$Activity2021) })
 
         if(input$Default == TRUE) {
-          CPI.Argentina[input$month] <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),input$month])}
-        else { CPI.Argentina[input$month] <- (1+Value()) }
-
-        RP.TotalSales <- colSums(apply(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2017:2021)],2,as.numeric)*
-                                   apply(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2017:2021)],2,as.numeric)/1000000)
-
-        AG.TotalSales <- colSums(as.numeric(DF.AGRO$mat[match(paste0("Average Price - ",Product.Retail), DF.AGRO$mat$Productos),"2017"])%*%
-                                   t(cumprod(as.numeric(CPI.Argentina)))*
-                                   DF.AGRO$mat[match(Product.Retail, DF.AGRO$mat$Productos),paste0("",2017:2021)]/1000000)
+          CPI.Argentina <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),paste0("",2019:2021)])
+          CPI.USA <- (1+DF1$mat[which(DF1$mat$Variables == "CPI US"),paste0("",2019:2021)])
+          Economic.Growth <- (1+DF1$mat[which(DF1$mat$Variables == "Argentina"),paste0("",2019:2021)]) }
+        else { CPI.Argentina <- (1+Value())
+               CPI.USA <- (1+Value1())
+               Economic.Growth <- (1+Value2())}
         
-        BIP.TotalSales <-   colSums(as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.Retail), DF.BIP$mat$Productos),"2017"])%*%
-                                      t(cumprod(as.numeric(CPI.Argentina)))*
-                                      DF.BIP$mat[match(Product.Retail, DF.BIP$mat$Productos),paste0("",2017:2021)]/1000000)
+       if(input$Default == TRUE) {
+          Devaluation.Argentina.EOP <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),paste0("",2019:2021)]
+          Devaluation.Argentina.AVG <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2019:2021)]}
+        else { Devaluation.Argentina.EOP <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"]*cumprod(as.numeric((CPI.Argentina/CPI.USA)))
+               Devaluation.Argentina.AVG <- (0.5*(c(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"],Devaluation.Argentina.EOP))[1:3]+
+                                                      as.numeric(Devaluation.Argentina.EOP)))) }
 
+        RP.TotalSales <- colSums(as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2018"])%*%
+                                    t(cumprod(as.numeric(CPI.Argentina)))*
+                                    as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                                       rbind(cumprod(as.numeric(Economic.Growth)),
+                                             cumprod(as.numeric(Economic.Growth)),
+                                             cumprod(c(1.10,1.10,1.10)),
+                                             cumprod(c(1.10,1.10,1.10)),
+                                             cumprod(c(1.30,1.30,1.30)))/1000000)
+        
+                  
+        
+        RP.TotalSales2018 <- as.numeric(DF.Retail$mat[match("Total Sales", DF.Retail$mat$Productos),"2018"])
+        RP.TotalSales <- c(RP.TotalSales2018, RP.TotalSales)
+        names(RP.TotalSales) <- c("2018","2019","2020","2021")
+        
+        Sustainable.Sourcing <- colSums(as.numeric(DF.AGRO$mat[match(paste0("Third parties - ",Product.Agro), DF.AGRO$mat$Productos),"2018"])%*%
+                                    t(cumprod(1+c(0.008,0.008,0.008)))* 
+                                    (DF.AGRO$mat[match(paste0("Third partiesAdj - ",Product.Agro), DF.AGRO$mat$Productos),"2018"]/20.59250)%*%
+                                    t(as.numeric(Devaluation.Argentina.AVG))/1000000)
+        
+        TotalSales.AgroServices <- 4166.78554012*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))
+        TotalSales.LogisticandPort <- 1172.445667*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))
+        
+        AG.TotalSales <- Sustainable.Sourcing + TotalSales.AgroServices + TotalSales.LogisticandPort
+        
+        AG.TotalSales2018 <- DF.AGRO$mat[match("Total Sales", DF.AGRO$mat$Productos),"2018"]
+        AG.TotalSales <- c(AG.TotalSales2018, AG.TotalSales)
+        names(AG.TotalSales) <- c("2018","2019","2020","2021")
+        
+        BIP.Growth <- as.numeric(ifelse(CPI.Argentina > Delt(as.numeric(c(DF1$mat[match("ARS/USD (EOP)",DF1$mat$Variables),"2018"],Devaluation.Argentina.EOP)))[-1],
+                                          CPI.Argentina - Delt(as.numeric(c(DF1$mat[match("ARS/USD (EOP)",DF1$mat$Variables),"2018"],Devaluation.Argentina.EOP)))[-1],1))
+        
+        Groth.Packaging <- pmax(Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1],CPI.Argentina)  
+        
+        BIP.TotalSales <-   colSums((as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.BIP[-4]), DF.BIP$mat$Productos),"2018"]/20.592500)%*%
+                                       t(cumprod(as.numeric(BIP.Growth))))*
+                                       rbind(Devaluation.Argentina.AVG,
+                                            Devaluation.Argentina.AVG,
+                                            Devaluation.Argentina.AVG)*
+                                       apply(DF.BIP$mat[match(Product.BIP[-4], DF.BIP$mat$Productos),paste0("",2019:2021)],2,as.numeric)/1000000) + 
+                                       DF.BIP$mat[match(Product.BIP[4], DF.BIP$mat$Productos),"2018"]*cumprod(1+as.numeric((Groth.Packaging*
+                                       (1+Delt(c(sum(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"]),
+                                                 colSums(as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                                                           rbind(cumprod(as.numeric(Economic.Growth)),
+                                                                 cumprod(as.numeric(Economic.Growth)),
+                                                                 cumprod(c(1.10,1.10,1.10)),
+                                                                 cumprod(c(1.10,1.10,1.10)),
+                                                                 cumprod(c(1.30,1.30,1.30))))))[-1]))-1))
+        
+        # cumprod(as.numeric(((Economic.Growth-1)*c(3.1084862,3.2041012,3.1318509)+1))),
+        # cumprod(as.numeric(((Economic.Growth-1)*c(3.1084862,3.2041012,3.1318509)+1))),
+        # cumprod(as.numeric(((Economic.Growth-1)*c(9.3254585,9.6123037,9.3955528))+1))
+        
+        
+        BIP.TotalSales2018 <- DF.BIP$mat[match("Total Sales", DF.BIP$mat$Productos),"2018"]
+        BIP.TotalSales <- c(BIP.TotalSales2018, BIP.TotalSales)
+        names(BIP.TotalSales) <- c("2018","2019","2020","2021")
+        
         Sales <- data.frame(Segment = c("RP","BIP","ASSS"),
                             Sales =   c(RP.TotalSales[paste0("",input$month)],
-                                        DF.BIP$mat[match("Total Sales",DF.BIP$mat$Productos),paste0("",input$month)],
-                                        DF.AGRO$mat[match("Total Sales",DF.AGRO$mat$Productos),paste0("",input$month)]))
+                                        BIP.TotalSales[paste0("",input$month)],
+                                        AG.TotalSales[paste0("",input$month)]))
         colors=c("#0059b3", "#0086b3", "#001f4d")
         plot_ly(Sales, labels = ~Segment, values = ~Sales, type = 'pie',
                 textposition = 'inside',
@@ -861,30 +1033,99 @@ server <- function(input, output, session) {
       output$Cogs = renderPlotly({
 
         Product.Retail <- c("Flour Products", "Oil", "Biscuits, Cookies and Crackers", "Bread Crumbs and Premixes (& Pasta)", "Frozen Products")
-        CPI.Argentina[1] <- 1
-
-        Value <-  eventReactive(input$submit1, {
-          input$inflation
-        })
-
-        if(input$Default == TRUE) {
-
-          CPI.Argentina[input$month] <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),input$month])     }
-        else {
-          CPI.Argentina[input$month] <- (1+Value()) }
-
-        RP.COGS <-  c((DF.Retail$mat[match("COGS", DF.Retail$mat$Productos),paste0("",2017)]),
-                      (DF.Retail$mat[match("COGS", DF.Retail$mat$Productos),paste0("",2018)]),
-                      -colSums(apply(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2019:2021)],2,as.numeric)*
-                                 apply(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2019:2021)],2,as.numeric)/1000000*
-                                 (1-DF.Retail$mat[match(paste0("Average Margins - ",Product.Retail),DF.Retail$mat$Productos),paste0("",2019:2021)])))
+        Product.Agro <- c("Wheat","Soybean","Corn","Others")
+        Product.BIP <- c("Wheat Flour","MRP","Soybean Flour and Co-Products","Cañuelas Pack")
         
-        names(RP.COGS) <- c("2017","2018","2019","2020","2021")
+        Value <-  eventReactive(input$submit1, {
+          c(input$inflation2019,input$inflation2020,input$inflation2021) })
+        
+        Value1 <-  eventReactive(input$submit1, {
+          c(input$CPI.USA2019,input$CPI.USA2020,input$CPI.USA2021) })
+        
+        Value2 <-  eventReactive(input$submit1, {
+          c(input$Activity2019,input$Activity2020,input$Activity2021) })
+        
+        if(input$Default == TRUE) {
+          CPI.Argentina <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),paste0("",2019:2021)])
+          CPI.USA <- (1+DF1$mat[which(DF1$mat$Variables == "CPI US"),paste0("",2019:2021)])
+          Economic.Growth <- (1+DF1$mat[which(DF1$mat$Variables == "Argentina"),paste0("",2019:2021)]) }
+        else { CPI.Argentina <- (1+Value())
+        CPI.USA <- (1+Value1())
+        Economic.Growth <- (1+Value2())}
+        
+        if(input$Default == TRUE) {
+          Devaluation.Argentina.EOP <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),paste0("",2019:2021)]
+          Devaluation.Argentina.AVG <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2019:2021)]}
+        else { Devaluation.Argentina.EOP <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"]*cumprod(as.numeric((CPI.Argentina/CPI.USA)))
+        Devaluation.Argentina.AVG <- (0.5*(c(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"],Devaluation.Argentina.EOP))[1:3]+
+                                               as.numeric(Devaluation.Argentina.EOP)))) }
+        
+        RP.COGS <- colSums(as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2018"])%*%
+                  t(cumprod(as.numeric(CPI.Argentina)))*
+                  (1-apply(DF.Retail$mat[match(paste0("Average Margins - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2019:2021)],2,as.numeric))* 
+                  as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                    rbind(cumprod(as.numeric(Economic.Growth)),
+                         cumprod(as.numeric(Economic.Growth)),
+                         cumprod(c(1.10,1.10,1.10)),
+                         cumprod(c(1.10,1.10,1.10)),
+                         cumprod(c(1.30,1.30,1.30)))/1000000)
+        
+                
+        RP.COGS2018 <- -as.numeric(DF.Retail$mat[match("COGS", DF.Retail$mat$Productos),"2018"])
+        RP.COGS <- c(RP.COGS2018, RP.COGS)
+        names(RP.COGS) <- c("2018","2019","2020","2021")
+        
+        Sustainable.Sourcing <- colSums(as.numeric(DF.AGRO$mat[match(paste0("Third parties - ",Product.Agro), DF.AGRO$mat$Productos),"2018"])%*%
+                                          t(cumprod(1+c(0.008,0.008,0.008)))* 
+                                          (DF.AGRO$mat[match(paste0("Third partiesAdj - ",Product.Agro), DF.AGRO$mat$Productos),"2018"]/20.59250)%*%
+                                          t(as.numeric(Devaluation.Argentina.AVG))/1000000)*
+                                          (1 - apply(DF.AGRO$mat[match("Gross Margin - Sustainable Sourcing", DF.AGRO$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        
+        TotalCOGS.AgroServices <- 4166.78554012*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))*
+                                   (1 - apply(DF.AGRO$mat[match("Gross Margin - Agro-services", DF.AGRO$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        
+        TotalCOGS.LogisticandPort <- 1172.445667*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))*
+                                       (1 - apply(DF.AGRO$mat[match("Gross Margin - Port and Logistics", DF.AGRO$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        
+        AG.TotalCOGS <- Sustainable.Sourcing + TotalCOGS.AgroServices + TotalCOGS.LogisticandPort
+        
+        AG.TotalCOGS2018 <- -DF.AGRO$mat[match("COGS", DF.AGRO$mat$Productos),"2018"]
+        AG.TotalCOGS <- c(AG.TotalCOGS2018, AG.TotalCOGS)
+        names(AG.TotalCOGS) <- c("2018","2019","2020","2021")
+        
+        BIP.Growth <- as.numeric(ifelse(CPI.Argentina > Delt(as.numeric(c(DF1$mat[match("ARS/USD (EOP)",DF1$mat$Variables),"2018"],Devaluation.Argentina.EOP)))[-1],
+                                        CPI.Argentina - Delt(as.numeric(c(DF1$mat[match("ARS/USD (EOP)",DF1$mat$Variables),"2018"],Devaluation.Argentina.EOP)))[-1],1))
+        
+        Groth.Packaging <- pmax(Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1],CPI.Argentina)  
+        
+        BIP.COGS <-   colSums((as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.BIP[-4]), DF.BIP$mat$Productos),"2018"]/20.592500)%*%
+                                 t(cumprod(as.numeric(BIP.Growth))))*
+                                rbind(Devaluation.Argentina.AVG,
+                                      Devaluation.Argentina.AVG,
+                                      Devaluation.Argentina.AVG)*
+                                (as.numeric(DF.BIP$mat[match(Product.BIP[-4], DF.BIP$mat$Productos),"2018"])*
+                                   rbind(cumprod(c(1.10145,1.09202,1.08339)),
+                                         cumprod(c(1.03217,1.03121,1.03193)),
+                                         cumprod(c(.70,0.80,0.80)))/1000000)*
+                                (1 - apply(DF.BIP$mat[match(paste0("Average Margins - ",Product.BIP[-4]), DF.BIP$mat$Productos),paste0("",2019:2021)],2,as.numeric)))+ 
+          DF.BIP$mat[match(Product.BIP[4], DF.BIP$mat$Productos),"2018"]*cumprod(1+as.numeric((Groth.Packaging*
+                                                                                                 (1+Delt(c(sum(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"]),
+                                                                                                           colSums(as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                                                                                                                     rbind(cumprod(as.numeric(Economic.Growth)),
+                                                                                                                           cumprod(as.numeric(Economic.Growth)),
+                                                                                                                           cumprod(c(1.10,1.10,1.10)),
+                                                                                                                           cumprod(c(1.10,1.10,1.10)),
+                                                                                                                           cumprod(c(1.30,1.30,1.30))))))[-1]))-1))*
+          (1 - apply(DF.BIP$mat[match(paste0("Average Margins - ",Product.BIP[4]), DF.BIP$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        BIP.COGS2018 <- -DF.BIP$mat[match("COGS", DF.BIP$mat$Productos),"2018"]
+        BIP.COGS <- c(BIP.COGS2018, BIP.COGS)
+        names(BIP.COGS) <- c("2018","2019","2020","2021")
 
+        
         Cogs <- data.frame(Segment = c("RP", "BIP","ASSS"),
-                           Cogs =   -c(RP.COGS[input$month],
-                                       DF.BIP$mat[match("COGS",DF.BIP$mat$Productos),paste0("",input$month)],
-                                       DF.AGRO$mat[match("COGS",DF.AGRO$mat$Productos),paste0("",input$month)]))
+                           Cogs =   c(RP.COGS[paste0("",input$month)],
+                                      BIP.COGS[paste0("",input$month)],
+                                      AG.TotalCOGS[paste0("",input$month)]))
         colors=c("#0059b3", "#0086b3", "#001f4d")
         plot_ly(Cogs, labels = ~Segment, values = ~Cogs, type = 'pie',
                 textposition = 'inside',
@@ -906,45 +1147,249 @@ server <- function(input, output, session) {
 
       output$Ebitda = renderPlotly({
         # The following code runs inside the databas
-        Vol.Change.Retail <- DF.Retail$mat[max(which(DF.Retail$mat$Productos == "Total Volume")),paste0("",2016:2021)][-1]/
-          DF.Retail$mat[max(which(DF.Retail$mat$Productos == "Total Volume")),paste0("",2016:2021)][-length(2016:2021)]-1
-
         Product.Retail <- c("Flour Products", "Oil", "Biscuits, Cookies and Crackers", "Bread Crumbs and Premixes (& Pasta)", "Frozen Products")
-        CPI.Argentina[1] <- 1
-
+        Product.Agro <- c("Wheat","Soybean","Corn","Others")
+        Product.BIP <- c("Wheat Flour","MRP","Soybean Flour and Co-Products","Cañuelas Pack")
+        
         Value <-  eventReactive(input$submit1, {
-          input$inflation
-        })
-
+          c(input$inflation2019,input$inflation2020,input$inflation2021) })
+        
+        Value1 <-  eventReactive(input$submit1, {
+          c(input$CPI.USA2019,input$CPI.USA2020,input$CPI.USA2021) })
+        
+        Value2 <-  eventReactive(input$submit1, {
+          c(input$Activity2019,input$Activity2020,input$Activity2021) })
+        
         if(input$Default == TRUE) {
-
-          CPI.Argentina[input$month] <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),input$month])     }
-        else {
-          CPI.Argentina[input$month] <- (1+Value()) }
-
-
-        RP.TotalSales <- colSums(apply(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2017:2021)],2,as.numeric)*
-                                   apply(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2017:2021)],2,as.numeric)/1000000)
+          CPI.Argentina <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),paste0("",2019:2021)])
+          CPI.USA <- (1+DF1$mat[which(DF1$mat$Variables == "CPI US"),paste0("",2019:2021)])
+          Economic.Growth <- (1+DF1$mat[which(DF1$mat$Variables == "Argentina"),paste0("",2019:2021)]) }
+        else { CPI.Argentina <- (1+Value())
+        CPI.USA <- (1+Value1())
+        Economic.Growth <- (1+Value2())}
         
-        RP.COGS <-  c((DF.Retail$mat[match("COGS", DF.Retail$mat$Productos),paste0("",2017)]),
-                      (DF.Retail$mat[match("COGS", DF.Retail$mat$Productos),paste0("",2018)]),
-                      -colSums(apply(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2019:2021)],2,as.numeric)*
-                                 apply(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2019:2021)],2,as.numeric)/1000000*
-                                 (1-DF.Retail$mat[match(paste0("Average Margins - ",Product.Retail),DF.Retail$mat$Productos),paste0("",2019:2021)])))
-        names(RP.COGS) <- c("2017","2018","2019","2020","2021")
+        if(input$Default == TRUE) {
+          Devaluation.Argentina.EOP <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),paste0("",2019:2021)]
+          Devaluation.Argentina.AVG <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2019:2021)]}
+        else { Devaluation.Argentina.EOP <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"]*cumprod(as.numeric((CPI.Argentina/CPI.USA)))
+        Devaluation.Argentina.AVG <- (0.5*(c(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"],Devaluation.Argentina.EOP))[1:3]+
+                                               as.numeric(Devaluation.Argentina.EOP)))) }
+       
+        Capacity.Expan <- c(25.00,41.00,25.00)
+        Depreciation <- NULL
+        Final.Period <- NULL
+        Maintenance <- NULL
         
-        RP.Gross.Margin <- DF.Retail$mat[match("Depreciation and Amortization",DF.Retail$mat$Productos),paste0("",2017:2021)] + RP.TotalSales + RP.COGS
-
-        RP.EBITDA <- (RP.Gross.Margin) + 
-                        DF.Retail$mat[match("Selling Expense", DF.Retail$mat$Productos),paste0("",2017:2021)] +
-                        DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),paste0("",2017:2021)] +
-                        DF.Retail$mat[match("Other Income, Net", DF.Retail$mat$Productos),paste0("",2017:2021)] - 
-                        DF.Retail$mat[match("Depreciation and Amortization",DF.Retail$mat$Productos),paste0("",2017:2021)]
+        for(i in 1:length(Capacity.Expan)){ 
+          if(i == 1){
+            Final.Period[i]  <- 17630.48
+            Maintenance[i] <- Final.Period[i]*0.02/as.numeric(Devaluation.Argentina.AVG)[i]
+            Depreciation[i] <- -as.numeric(((Devaluation.Argentina.AVG*(Capacity.Expan + Maintenance))[[i]] + Final.Period[[i]] + Final.Period[[i]]*(Delt(c(as.numeric(DF1$mat[
+              which(DF1$mat$Variables == "ARS/USD (EOP)"),paste0("",2018:2020)])[i],as.numeric(Devaluation.Argentina.EOP)[i]))[[-1]]))/22.10) 
+          } else {
+            Final.Period[i] <- as.numeric(Final.Period[[i-1]] +  Depreciation[[i-1]] + (Devaluation.Argentina.AVG*(Capacity.Expan[i-1] + Maintenance[i-1]))[i-1] + 
+                                          Final.Period[[i-1]]*(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"],Devaluation.Argentina.EOP))[i]/
+                                          as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"],Devaluation.Argentina.EOP)[i-1]))-Final.Period[[i-1]])
+            Maintenance[i] <- Final.Period[i]*0.02/as.numeric(Devaluation.Argentina.AVG)[i]
+            
+            Depreciation[i] <- -as.numeric((Devaluation.Argentina.AVG*(Capacity.Expan[i] + Maintenance[i]))[[i]] + Final.Period[[i]] + Final.Period[[i]]*
+                                (1+Delt(c(as.numeric(Devaluation.Argentina.EOP[i-1]),as.numeric(Devaluation.Argentina.EOP)[i]))[[-1]])-Final.Period[[i]])/
+                                  22.102698 
+            
+            
+            
+          }
+        }
+        
+        
+         
+        RP.TotalSales <- colSums(as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2018"])%*%
+                                   t(cumprod(as.numeric(CPI.Argentina)))*
+                                   as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                                   rbind(cumprod(as.numeric(Economic.Growth)),
+                                         cumprod(as.numeric(Economic.Growth)),
+                                         cumprod(c(1.10,1.10,1.10)),
+                                         cumprod(c(1.10,1.10,1.10)),
+                                         cumprod(c(1.30,1.30,1.30)))/1000000)
+        
+        
+        
+        RP.TotalSales2018 <- as.numeric(DF.Retail$mat[match("Total Sales", DF.Retail$mat$Productos),"2018"])
+        RP.TotalSales <- c(RP.TotalSales2018, RP.TotalSales)
+        names(RP.TotalSales) <- c("2018","2019","2020","2021")
+        
+        
+        RP.COGS <- colSums(as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2018"])%*%
+                             t(cumprod(as.numeric(CPI.Argentina)))*
+                             (1-apply(DF.Retail$mat[match(paste0("Average Margins - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2019:2021)],2,as.numeric))* 
+                             as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                             rbind(cumprod(as.numeric(Economic.Growth)),
+                                   cumprod(as.numeric(Economic.Growth)),
+                                   cumprod(c(1.10,1.10,1.10)),
+                                   cumprod(c(1.10,1.10,1.10)),
+                                   cumprod(c(1.30,1.30,1.30)))/1000000)
+        
+        RP.COGS2018 <- -as.numeric(DF.Retail$mat[match("COGS", DF.Retail$mat$Productos),"2018"])
+        RP.COGS <- c(RP.COGS2018, RP.COGS)
+        names(RP.COGS) <- c("2018","2019","2020","2021")
+        
+        RP.Gross.Margin <- c(DF.Retail$mat[match("Depreciation and Amortization",DF.Retail$mat$Productos),"2018"],Depreciation*0.41360) + RP.TotalSales - RP.COGS
                       
+        Vol.Change <-c(sum(as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])),
+                       colSums(as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                                rbind(cumprod(as.numeric(Economic.Growth)),
+                                      cumprod(as.numeric(Economic.Growth)),
+                                      cumprod(c(1.10,1.10,1.10)),
+                                      cumprod(c(1.10,1.10,1.10)),
+                                      cumprod(c(1.30,1.30,1.30)))))
+        
+        Selling.Expense <- DF.Retail$mat[match("Selling Expense", DF.Retail$mat$Productos),"2018"]*
+                           cumprod(as.numeric(CPI.Argentina)*(((1+Delt(Vol.Change)[-1]))))
+        
+        Administrative.Expense <- DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),"2018"]*
+                                  cumprod(as.numeric(CPI.Argentina))
+        
+        RP.EBITDA <- (RP.Gross.Margin) + 
+                        c(DF.Retail$mat[match("Selling Expense", DF.Retail$mat$Productos),"2018"],Selling.Expense) +
+                        c(DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),"2018"],Administrative.Expense) +
+                        -c(DF.Retail$mat[match("Depreciation and Amortization",DF.Retail$mat$Productos),"2018"],Depreciation*0.41360)
+        
+        ######## BIP
+        BIP.Growth <- as.numeric(ifelse(CPI.Argentina > Delt(as.numeric(c(DF1$mat[match("ARS/USD (EOP)",DF1$mat$Variables),"2018"],Devaluation.Argentina.EOP)))[-1],
+                                        CPI.Argentina - Delt(as.numeric(c(DF1$mat[match("ARS/USD (EOP)",DF1$mat$Variables),"2018"],Devaluation.Argentina.EOP)))[-1],1))
+        
+        Groth.Packaging <- pmax(Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1],CPI.Argentina)  
+        
+        BIP.TotalSales <-   colSums((as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.BIP[-4]), DF.BIP$mat$Productos),"2018"]/20.592500)%*%
+                                       t(cumprod(as.numeric(BIP.Growth))))*
+                                      rbind(Devaluation.Argentina.AVG,
+                                            Devaluation.Argentina.AVG,
+                                            Devaluation.Argentina.AVG)*
+                                      apply(DF.BIP$mat[match(Product.BIP[-4], DF.BIP$mat$Productos),paste0("",2019:2021)],2,as.numeric)/1000000) + 
+          DF.BIP$mat[match(Product.BIP[4], DF.BIP$mat$Productos),"2018"]*cumprod(1+as.numeric((Groth.Packaging*
+                                                                                                 (1+Delt(c(sum(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"]),
+                                                                                                           colSums(as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                                                                                                                     rbind(cumprod(as.numeric(Economic.Growth)),
+                                                                                                                           cumprod(as.numeric(Economic.Growth)),
+                                                                                                                           cumprod(c(1.10,1.10,1.10)),
+                                                                                                                           cumprod(c(1.10,1.10,1.10)),
+                                                                                                                           cumprod(c(1.30,1.30,1.30))))))[-1]))-1))
+        
+        
+        BIP.TotalSales2018 <- DF.BIP$mat[match("Total Sales", DF.BIP$mat$Productos),"2018"]
+        BIP.TotalSales <- c(BIP.TotalSales2018, BIP.TotalSales)
+        names(BIP.TotalSales) <- c("2018","2019","2020","2021")
+        
+        BIP.COGS <-   colSums((as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.BIP[-4]), DF.BIP$mat$Productos),"2018"]/20.592500)%*%
+                                 t(cumprod(as.numeric(BIP.Growth))))*
+                                rbind(Devaluation.Argentina.AVG,
+                                      Devaluation.Argentina.AVG,
+                                      Devaluation.Argentina.AVG)*
+                                (as.numeric(DF.BIP$mat[match(Product.BIP[-4], DF.BIP$mat$Productos),"2018"])*
+                                   rbind(cumprod(c(1.10145,1.09202,1.08339)),
+                                         cumprod(c(1.03217,1.03121,1.03193)),
+                                         cumprod(c(.70,0.80,0.80)))/1000000)*
+                                (1 - apply(DF.BIP$mat[match(paste0("Average Margins - ",Product.BIP[-4]), DF.BIP$mat$Productos),paste0("",2019:2021)],2,as.numeric)))+ 
+          DF.BIP$mat[match(Product.BIP[4], DF.BIP$mat$Productos),"2018"]*cumprod(1+as.numeric((Groth.Packaging*
+ (1+Delt(c(sum(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"]),
+           colSums(as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                     rbind(cumprod(as.numeric(Economic.Growth)),
+                           cumprod(as.numeric(Economic.Growth)),
+                           cumprod(c(1.10,1.10,1.10)),
+                           cumprod(c(1.10,1.10,1.10)),
+                           cumprod(c(1.30,1.30,1.30))))))[-1]))-1))*
+       (1 - apply(DF.BIP$mat[match(paste0("Average Margins - ",Product.BIP[4]), DF.BIP$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        
+        BIP.COGS2018 <- -DF.BIP$mat[match("COGS", DF.BIP$mat$Productos),"2018"]
+        BIP.COGS <- c(BIP.COGS2018, BIP.COGS)
+        names(BIP.COGS) <- c("2018","2019","2020","2021")
+        
+        BP.Gross.Margin <- c(DF.BIP$mat[match("Depreciation and Amortization",DF.BIP$mat$Productos),"2018"],Depreciation*0.44875) + BIP.TotalSales - BIP.COGS
+        
+        Growth.Vol.Wheat <- (1+Delt(c(sum(as.numeric(DF.BIP$mat[match(Product.BIP[-c(3,4)], DF.BIP$mat$Productos),"2018"])),
+                            colSums(as.numeric(DF.BIP$mat[match(Product.BIP[-c(3,4)], DF.BIP$mat$Productos),"2018"])*
+                            rbind(cumprod(1+as.numeric((Economic.Growth-1)*c(3.15359,2.94845,2.61171))),cumprod(1+as.numeric(Economic.Growth-1))))))[-1])*
+                            CPI.Argentina
+        
+         
+          
+        Selling.Expense <-  colSums(rbind(-1568.14593002*cumprod(as.numeric(Growth.Vol.Wheat)),
+                                    -(as.numeric(DF.BIP$mat[match(Product.BIP[3], DF.BIP$mat$Productos),"2018"])*
+                                      cumprod(1+as.numeric(Economic.Growth-1)*(-c(9.32546,6.40820,6.26370)))*
+                                      (as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.BIP[3]), DF.BIP$mat$Productos),"2018"]/20.592500)*
+                                         t(cumprod(as.numeric(BIP.Growth))))*Devaluation.Argentina.AVG)/1000000*c(0.29,0.29,0.29)))
+        
+        Administrative.Expense <- DF.BIP$mat[match("Administrative Expense", DF.BIP$mat$Productos),"2018"]*
+                                  cumprod(as.numeric(CPI.Argentina))
+                      
+        BP.EBITDA <-  (BP.Gross.Margin) + 
+                      c(DF.BIP$mat[match("Selling Expense", DF.BIP$mat$Productos),"2018"],Selling.Expense) +
+                      c(DF.BIP$mat[match("Administrative Expense", DF.BIP$mat$Productos),"2018"],Administrative.Expense) +
+                      -c(DF.BIP$mat[match("Depreciation and Amortization",DF.BIP$mat$Productos),"2018"],Depreciation*0.44875)
+        
+        
+        #################AGROBusiness
+        
+        Sustainable.Sourcing <- colSums(as.numeric(DF.AGRO$mat[match(paste0("Third parties - ",Product.Agro), DF.AGRO$mat$Productos),"2018"])%*%
+                                          t(cumprod(1+c(0.008,0.008,0.008)))* 
+                                          (DF.AGRO$mat[match(paste0("Third partiesAdj - ",Product.Agro), DF.AGRO$mat$Productos),"2018"]/20.59250)%*%
+                                          t(as.numeric(Devaluation.Argentina.AVG))/1000000)*
+          (1 - apply(DF.AGRO$mat[match("Gross Margin - Sustainable Sourcing", DF.AGRO$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        
+        TotalCOGS.AgroServices <- 4166.78554012*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))*
+                                      (1 - apply(DF.AGRO$mat[match("Gross Margin - Agro-services", DF.AGRO$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        
+        TotalCOGS.LogisticandPort <- 1172.445667*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))*
+                                       (1 - apply(DF.AGRO$mat[match("Gross Margin - Port and Logistics", DF.AGRO$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        
+        AG.TotalCOGS <- Sustainable.Sourcing + TotalCOGS.AgroServices + TotalCOGS.LogisticandPort
+        
+        AG.TotalCOGS2018 <- -DF.AGRO$mat[match("COGS", DF.AGRO$mat$Productos),"2018"]
+        AG.TotalCOGS <- c(AG.TotalCOGS2018, AG.TotalCOGS)
+        names(AG.TotalCOGS) <- c("2018","2019","2020","2021")
+        
+        
+        Sustainable.Sourcing <- colSums(as.numeric(DF.AGRO$mat[match(paste0("Third parties - ",Product.Agro), DF.AGRO$mat$Productos),"2018"])%*%
+                                          t(cumprod(1+c(0.008,0.008,0.008)))* 
+                                          (DF.AGRO$mat[match(paste0("Third partiesAdj - ",Product.Agro), DF.AGRO$mat$Productos),"2018"]/20.59250)%*%
+                                          t(as.numeric(Devaluation.Argentina.AVG))/1000000)
+        
+        TotalSales.AgroServices <- 4166.78554012*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))
+        TotalSales.LogisticandPort <- 1172.445667*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))
+        
+        AG.TotalSales <- Sustainable.Sourcing + TotalSales.AgroServices + TotalSales.LogisticandPort
+        
+        AG.TotalSales2018 <- DF.AGRO$mat[match("Total Sales", DF.AGRO$mat$Productos),"2018"]
+        AG.TotalSales <- c(AG.TotalSales2018, AG.TotalSales)
+        names(AG.TotalSales) <- c("2018","2019","2020","2021")
+        
+        Biological.Assets <- c(DF.AGRO$mat[match("Gain Biological asset",DF.AGRO$mat$Productos),"2018"],
+                               DF.AGRO$mat[match("Gain Biological asset",DF.AGRO$mat$Productos),"2018"]*
+                                 cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),
+                                 paste0("",2018)],Devaluation.Argentina.AVG)))[-1])))
+        
+        ASSS.Gross.Margin <- c(DF.AGRO$mat[match("Depreciation and Amortization",DF.AGRO$mat$Productos),"2018"],Depreciation*0.13765) + Biological.Assets + AG.TotalSales - AG.TotalCOGS
+        
+        Selling.Expense <- c(DF.AGRO$mat[match("Selling Expense",DF.AGRO$mat$Productos),"2018"],
+                             DF.AGRO$mat[match("Selling Expense",DF.AGRO$mat$Productos),"2018"]*
+                               cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),
+                               paste0("",2018)],Devaluation.Argentina.AVG)))[-1]))*
+                               cumprod(1+c(0.008,0.008,0.008)))
+        
+        Administrative.Expense <- c(DF.AGRO$mat[match("Administrative Expense",DF.AGRO$mat$Productos),"2018"],
+                                    DF.AGRO$mat[match("Administrative Expense",DF.AGRO$mat$Productos),"2018"]*
+                                      cumprod(as.numeric(CPI.Argentina)))
+          
+        Others <- DF.AGRO$mat[match("Other Income, Net",DF.AGRO$mat$Productos),paste0("",2018:2021)]
+        
+        ASSS.EBITDA <- ASSS.Gross.Margin + Selling.Expense + Administrative.Expense + Others - 
+                         c(DF.AGRO$mat[match("Depreciation and Amortization",DF.AGRO$mat$Productos),"2018"],Depreciation*0.13765)
+        
         Ebitda <- data.frame(Segment = c("RP", "BIP","ASSS"),
                              Ebitda = c(as.numeric(RP.EBITDA[paste0("",input$month)]),
-                                        DF.BIP$mat[match("Reported Adjusted Segment EBITDA",DF.BIP$mat$Productos),paste0("",input$month)],
-                                        DF.AGRO$mat[match("Reported Adjusted Segment EBITDA",DF.AGRO$mat$Productos),paste0("",input$month)]))
+                                        as.numeric(BP.EBITDA[paste0("",input$month)]),
+                                        as.numeric(ASSS.EBITDA[paste0("",input$month)])))
+        
         colors=c("#0059b3", "#0086b3", "#001f4d")
         plot_ly(Ebitda, labels = ~Segment, values = ~Ebitda, type = 'pie',
                 textposition = 'inside',
@@ -967,50 +1412,240 @@ server <- function(input, output, session) {
       output$Ebitdapct = renderPlotly({
 
         # The following code runs inside the databas
-        Vol.Change.Retail <- DF.Retail$mat[max(which(DF.Retail$mat$Productos == "Total Volume")),paste0("",2016:2021)][-1]/
-          DF.Retail$mat[max(which(DF.Retail$mat$Productos == "Total Volume")),paste0("",2016:2021)][-length(2016:2021)]-1
-
         Product.Retail <- c("Flour Products", "Oil", "Biscuits, Cookies and Crackers", "Bread Crumbs and Premixes (& Pasta)", "Frozen Products")
-        CPI.Argentina[1] <- 1
-
-        Value <-  eventReactive(input$submit1, {
-          input$inflation
-        })
-
-        if(input$Default == TRUE) {
-
-          CPI.Argentina[input$month] <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),input$month])     }
-        else {
-          CPI.Argentina[input$month] <- (1+Value()) }
-
-
-        RP.TotalSales <- colSums(apply(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2017:2021)],2,as.numeric)*
-                                   apply(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2017:2021)],2,as.numeric)/1000000)
-          
-        RP.COGS <-         c((DF.Retail$mat[match("COGS", DF.Retail$mat$Productos),paste0("",2017)]),
-                             (DF.Retail$mat[match("COGS", DF.Retail$mat$Productos),paste0("",2018)]),
-                            -colSums(apply(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2019:2021)],2,as.numeric)*
-                               apply(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2019:2021)],2,as.numeric)/1000000*
-                               (1-DF.Retail$mat[match(paste0("Average Margins - ",Product.Retail),DF.Retail$mat$Productos),paste0("",2019:2021)])))
-        names(RP.COGS) <- c("2017","2018","2019","2020","2021")
+        Product.Agro <- c("Wheat","Soybean","Corn","Others")
+        Product.BIP <- c("Wheat Flour","MRP","Soybean Flour and Co-Products","Cañuelas Pack")
         
-        RP.Gross.Margin <- DF.Retail$mat[match("Depreciation and Amortization",DF.Retail$mat$Productos),paste0("",2017:2021)] + RP.TotalSales + RP.COGS
-
+        Value <-  eventReactive(input$submit1, {
+          c(input$inflation2019,input$inflation2020,input$inflation2021) })
+        
+        Value1 <-  eventReactive(input$submit1, {
+          c(input$CPI.USA2019,input$CPI.USA2020,input$CPI.USA2021) })
+        
+        Value2 <-  eventReactive(input$submit1, {
+          c(input$Activity2019,input$Activity2020,input$Activity2021) })
+        
+        if(input$Default == TRUE) {
+          CPI.Argentina <- (1+DF1$mat[which(DF1$mat$Variables == "CPI Argentina"),paste0("",2019:2021)])
+          CPI.USA <- (1+DF1$mat[which(DF1$mat$Variables == "CPI US"),paste0("",2019:2021)])
+          Economic.Growth <- (1+DF1$mat[which(DF1$mat$Variables == "Argentina"),paste0("",2019:2021)]) }
+        else { CPI.Argentina <- (1+Value())
+        CPI.USA <- (1+Value1())
+        Economic.Growth <- (1+Value2())}
+        
+        if(input$Default == TRUE) {
+          Devaluation.Argentina.EOP <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),paste0("",2019:2021)]
+          Devaluation.Argentina.AVG <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2019:2021)]}
+        else { Devaluation.Argentina.EOP <- DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"]*cumprod(as.numeric((CPI.Argentina/CPI.USA)))
+        Devaluation.Argentina.AVG <- (0.5*(c(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"],Devaluation.Argentina.EOP))[1:3]+
+                                               as.numeric(Devaluation.Argentina.EOP)))) }
+        
+        
+        Capacity.Expan <- c(25.00,41.00,25.00)
+        Depreciation <- NULL
+        Final.Period <- NULL
+        Maintenance <- NULL
+        for(i in 1:length(Capacity.Expan)){ 
+          if(i == 1){
+            Final.Period[i]  <- 17630.48
+            Maintenance[i] <- Final.Period[i]*0.02/as.numeric(Devaluation.Argentina.AVG)[i]
+            Depreciation[i] <- -as.numeric(((Devaluation.Argentina.AVG*(Capacity.Expan + Maintenance))[[i]] + Final.Period[[i]] + Final.Period[[i]]*(Delt(c(as.numeric(DF1$mat[
+              which(DF1$mat$Variables == "ARS/USD (EOP)"),paste0("",2018:2020)])[i],as.numeric(Devaluation.Argentina.EOP)[i]))[[-1]]))/22.10) 
+          } else {
+            Final.Period[i] <- as.numeric(Final.Period[[i-1]] +  Depreciation[[i-1]] + (Devaluation.Argentina.AVG*(Capacity.Expan[i-1] + Maintenance[i-1]))[i-1] + 
+                                            Final.Period[[i-1]]*(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"],Devaluation.Argentina.EOP))[i]/
+                                                                   as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (EOP)"),"2018"],Devaluation.Argentina.EOP)[i-1]))-Final.Period[[i-1]])
+            Maintenance[i] <- Final.Period[i]*0.02/as.numeric(Devaluation.Argentina.AVG)[i]
+            
+            Depreciation[i] <- -as.numeric((Devaluation.Argentina.AVG*(Capacity.Expan[i] + Maintenance[i]))[[i]] + Final.Period[[i]] + Final.Period[[i]]*
+                                             (1+Delt(c(as.numeric(Devaluation.Argentina.EOP[i-1]),as.numeric(Devaluation.Argentina.EOP)[i]))[[-1]])-Final.Period[[i]])/
+              22.102698 
+            
+            
+            
+          }
+        }
+        
+        
+        
+        RP.TotalSales <- colSums(as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2018"])%*%
+                                   t(cumprod(as.numeric(CPI.Argentina)))*
+                                   as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                                   rbind(cumprod(as.numeric(Economic.Growth)),
+                                         cumprod(as.numeric(Economic.Growth)),
+                                         cumprod(c(1.10,1.10,1.10)),
+                                         cumprod(c(1.10,1.10,1.10)),
+                                         cumprod(c(1.30,1.30,1.30)))/1000000)
+        
+        
+        RP.TotalSales2018 <- as.numeric(DF.Retail$mat[match("Total Sales", DF.Retail$mat$Productos),"2018"])
+        RP.TotalSales <- c(RP.TotalSales2018, RP.TotalSales)
+        names(RP.TotalSales) <- c("2018","2019","2020","2021")
+        
+        
+        RP.COGS <- colSums(as.numeric(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),"2018"])%*%
+                             t(cumprod(as.numeric(CPI.Argentina)))*
+                             (1-apply(DF.Retail$mat[match(paste0("Average Margins - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2019:2021)],2,as.numeric))* 
+                             as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                             rbind(cumprod(as.numeric(Economic.Growth)),
+                                   cumprod(as.numeric(Economic.Growth)),
+                                   cumprod(c(1.10,1.10,1.10)),
+                                   cumprod(c(1.10,1.10,1.10)),
+                                   cumprod(c(1.30,1.30,1.30)))/1000000)
+        
+        
+        RP.COGS2018 <- -as.numeric(DF.Retail$mat[match("COGS", DF.Retail$mat$Productos),"2018"])
+        RP.COGS <- c(RP.COGS2018, RP.COGS)
+        names(RP.COGS) <- c("2018","2019","2020","2021")
+        
+        RP.Gross.Margin <- c(DF.Retail$mat[match("Depreciation and Amortization",DF.Retail$mat$Productos),"2018"],Depreciation*0.41360) + RP.TotalSales - RP.COGS
+        
+        Selling.Expense <- DF.Retail$mat[match("Selling Expense", DF.Retail$mat$Productos),"2018"]*
+                           cumprod(as.numeric(CPI.Argentina)*c(1.058922,1.072717,1.058103))
+        
+        Administrative.Expense <- DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),"2018"]*
+                                  cumprod(as.numeric(CPI.Argentina))
+        
         RP.EBITDA <-  (RP.Gross.Margin) + 
-                      DF.Retail$mat[match("Selling Expense", DF.Retail$mat$Productos),paste0("",2017:2021)] +
-                      DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),paste0("",2017:2021)] +
-                      DF.Retail$mat[match("Other Income, Net", DF.Retail$mat$Productos),paste0("",2017:2021)] - 
-                      DF.Retail$mat[match("Depreciation and Amortization",DF.Retail$mat$Productos),paste0("",2017:2021)]
-
-        RP.TotalSales <- colSums(apply(DF.Retail$mat[match(paste0("Average Price - ",Product.Retail), DF.Retail$mat$Productos),paste0("",2017:2021)],2,as.numeric)*
-                                   apply(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),paste0("",2017:2021)],2,as.numeric)/1000000)
+                      c(DF.Retail$mat[match("Selling Expense", DF.Retail$mat$Productos),"2018"],Selling.Expense) +
+                      c(DF.Retail$mat[match("Administrative Expense", DF.Retail$mat$Productos),"2018"],Administrative.Expense) +
+                      -c(DF.Retail$mat[match("Depreciation and Amortization",DF.Retail$mat$Productos),"2018"],Depreciation*0.41360)
+        
+        ######## BIP
+        BIP.Growth <- as.numeric(ifelse(CPI.Argentina > Delt(as.numeric(c(DF1$mat[match("ARS/USD (EOP)",DF1$mat$Variables),"2018"],Devaluation.Argentina.EOP)))[-1],
+                                        CPI.Argentina - Delt(as.numeric(c(DF1$mat[match("ARS/USD (EOP)",DF1$mat$Variables),"2018"],Devaluation.Argentina.EOP)))[-1],1))
+        
+        Groth.Packaging <- pmax(Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1],CPI.Argentina)  
+        
+        BIP.TotalSales <-   colSums((as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.BIP[-4]), DF.BIP$mat$Productos),"2018"]/20.592500)%*%
+                                       t(cumprod(as.numeric(BIP.Growth))))*
+                                      rbind(Devaluation.Argentina.AVG,
+                                            Devaluation.Argentina.AVG,
+                                            Devaluation.Argentina.AVG)*
+                                      apply(DF.BIP$mat[match(Product.BIP[-4], DF.BIP$mat$Productos),paste0("",2019:2021)],2,as.numeric)/1000000) + 
+                               DF.BIP$mat[match(Product.BIP[4], DF.BIP$mat$Productos),"2018"]*cumprod(1+as.numeric((Groth.Packaging*
+                                 (1+Delt(c(sum(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"]),
+                                           colSums(as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                                                     rbind(cumprod(as.numeric(Economic.Growth)),
+                                                           cumprod(as.numeric(Economic.Growth)),
+                                                           cumprod(c(1.10,1.10,1.10)),
+                                                           cumprod(c(1.10,1.10,1.10)),
+                                                           cumprod(c(1.30,1.30,1.30))))))[-1]))-1))
+                                  
+        BIP.TotalSales2018 <- DF.BIP$mat[match("Total Sales", DF.BIP$mat$Productos),"2018"]
+        BIP.TotalSales <- c(BIP.TotalSales2018, BIP.TotalSales)
+        names(BIP.TotalSales) <- c("2018","2019","2020","2021")
+        
+        BIP.COGS <-   colSums((as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.BIP[-4]), DF.BIP$mat$Productos),"2018"]/20.592500)%*%
+                                 t(cumprod(as.numeric(BIP.Growth))))*
+                                rbind(Devaluation.Argentina.AVG,
+                                      Devaluation.Argentina.AVG,
+                                      Devaluation.Argentina.AVG)*
+                                (as.numeric(DF.BIP$mat[match(Product.BIP[-4], DF.BIP$mat$Productos),"2018"])*
+                                   rbind(cumprod(c(1.10145,1.09202,1.08339)),
+                                         cumprod(c(1.03217,1.03121,1.03193)),
+                                         cumprod(c(.70,0.80,0.80)))/1000000)*
+                                (1 - apply(DF.BIP$mat[match(paste0("Average Margins - ",Product.BIP[-4]), DF.BIP$mat$Productos),paste0("",2019:2021)],2,as.numeric)))+ 
+                              DF.BIP$mat[match(Product.BIP[4], DF.BIP$mat$Productos),"2018"]*cumprod(1+as.numeric((Groth.Packaging*
+                              (1+Delt(c(sum(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"]),
+                                        colSums(as.numeric(DF.Retail$mat[match(Product.Retail, DF.Retail$mat$Productos),"2018"])*
+                                                  rbind(cumprod(as.numeric(Economic.Growth)),
+                                                        cumprod(as.numeric(Economic.Growth)),
+                                                        cumprod(c(1.10,1.10,1.10)),
+                                                        cumprod(c(1.10,1.10,1.10)),
+                                                        cumprod(c(1.30,1.30,1.30))))))[-1]))-1))*
+                              (1 - apply(DF.BIP$mat[match(paste0("Average Margins - ",Product.BIP[4]), DF.BIP$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+                            
+        BIP.COGS2018 <- -DF.BIP$mat[match("COGS", DF.BIP$mat$Productos),"2018"]
+        BIP.COGS <- c(BIP.COGS2018, BIP.COGS)
+        names(BIP.COGS) <- c("2018","2019","2020","2021")
+        
+        BP.Gross.Margin <- c(DF.BIP$mat[match("Depreciation and Amortization",DF.BIP$mat$Productos),"2018"],Depreciation*0.44875) + BIP.TotalSales - BIP.COGS
+        
+        Growth.Vol.Wheat <- (1+Delt(c(sum(as.numeric(DF.BIP$mat[match(Product.BIP[-c(3,4)], DF.BIP$mat$Productos),"2018"])),
+                                      colSums(as.numeric(DF.BIP$mat[match(Product.BIP[-c(3,4)], DF.BIP$mat$Productos),"2018"])*
+                                     rbind(cumprod(1+as.numeric((Economic.Growth-1)*c(3.15359,2.94845,2.61171))),
+                                           cumprod(1+as.numeric(Economic.Growth-1))))))[-1])*CPI.Argentina
+        
+        Selling.Expense <-  colSums(rbind(-1568.14593002*cumprod(as.numeric(Growth.Vol.Wheat)),
+                                          -(as.numeric(DF.BIP$mat[match(Product.BIP[3], DF.BIP$mat$Productos),"2018"])*
+                                           cumprod(1+as.numeric(Economic.Growth-1)*(-c(9.32546,6.40820,6.26370)))*
+                                           (as.numeric(DF.BIP$mat[match(paste0("Average Price - ",Product.BIP[3]), DF.BIP$mat$Productos),"2018"]/20.592500)*
+                                           t(cumprod(as.numeric(BIP.Growth))))*Devaluation.Argentina.AVG)/1000000*c(0.29,0.29,0.29)))
+        
+        Administrative.Expense <- DF.BIP$mat[match("Administrative Expense", DF.BIP$mat$Productos),"2018"]*
+                                  cumprod(as.numeric(CPI.Argentina))
+        BP.EBITDA <-  (BP.Gross.Margin) + 
+                      c(DF.BIP$mat[match("Selling Expense", DF.BIP$mat$Productos),"2018"],Selling.Expense) +
+                      c(DF.BIP$mat[match("Administrative Expense", DF.BIP$mat$Productos),"2018"],Administrative.Expense) +
+                      -c(DF.BIP$mat[match("Depreciation and Amortization",DF.BIP$mat$Productos),"2018"],Depreciation*0.44875)
+        
+        #################AGROBusiness
+        
+        Sustainable.Sourcing <- colSums(as.numeric(DF.AGRO$mat[match(paste0("Third parties - ",Product.Agro), DF.AGRO$mat$Productos),"2018"])%*%
+                                          t(cumprod(1+c(0.008,0.008,0.008)))* 
+                                          (DF.AGRO$mat[match(paste0("Third partiesAdj - ",Product.Agro), DF.AGRO$mat$Productos),"2018"]/20.59250)%*%
+                                          t(as.numeric(Devaluation.Argentina.AVG))/1000000)*
+          (1 - apply(DF.AGRO$mat[match("Gross Margin - Sustainable Sourcing", DF.AGRO$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        
+        TotalCOGS.AgroServices <- 4166.78554012*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))*
+          (1 - apply(DF.AGRO$mat[match("Gross Margin - Agro-services", DF.AGRO$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        
+        TotalCOGS.LogisticandPort <- 1172.445667*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))*
+          (1 - apply(DF.AGRO$mat[match("Gross Margin - Port and Logistics", DF.AGRO$mat$Productos),paste0("",2019:2021)],2,as.numeric))
+        
+        AG.TotalCOGS <- Sustainable.Sourcing + TotalCOGS.AgroServices + TotalCOGS.LogisticandPort
+        
+        AG.TotalCOGS2018 <- -DF.AGRO$mat[match("COGS", DF.AGRO$mat$Productos),"2018"]
+        AG.TotalCOGS <- c(AG.TotalCOGS2018, AG.TotalCOGS)
+        names(AG.TotalCOGS) <- c("2018","2019","2020","2021")
+        
+        
+        Sustainable.Sourcing <- colSums(as.numeric(DF.AGRO$mat[match(paste0("Third parties - ",Product.Agro), DF.AGRO$mat$Productos),"2018"])%*%
+                                          t(cumprod(1+c(0.008,0.008,0.008)))* 
+                                          (DF.AGRO$mat[match(paste0("Third partiesAdj - ",Product.Agro), DF.AGRO$mat$Productos),"2018"]/20.59250)%*%
+                                          t(as.numeric(Devaluation.Argentina.AVG))/1000000)
+        
+        TotalSales.AgroServices <- 4166.78554012*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))
+        TotalSales.LogisticandPort <- 1172.445667*cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),paste0("",2018)],Devaluation.Argentina.AVG)))[-1])*(1+c(0.008,0.008,0.008)))
+        
+        AG.TotalSales <- Sustainable.Sourcing + TotalSales.AgroServices + TotalSales.LogisticandPort
+        
+        AG.TotalSales2018 <- DF.AGRO$mat[match("Total Sales", DF.AGRO$mat$Productos),"2018"]
+        AG.TotalSales <- c(AG.TotalSales2018, AG.TotalSales)
+        names(AG.TotalSales) <- c("2018","2019","2020","2021")
+        
+        Biological.Assets <- c(DF.AGRO$mat[match("Gain Biological asset",DF.AGRO$mat$Productos),"2018"],
+                               DF.AGRO$mat[match("Gain Biological asset",DF.AGRO$mat$Productos),"2018"]*
+                                 cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),
+                                                                      paste0("",2018)],Devaluation.Argentina.AVG)))[-1])))
+        
+        ASSS.Gross.Margin <- c(DF.AGRO$mat[match("Depreciation and Amortization",DF.AGRO$mat$Productos),"2018"],Depreciation*0.13765) + Biological.Assets + AG.TotalSales - AG.TotalCOGS
+        
+        Selling.Expense <- c(DF.AGRO$mat[match("Selling Expense",DF.AGRO$mat$Productos),"2018"],
+                             DF.AGRO$mat[match("Selling Expense",DF.AGRO$mat$Productos),"2018"]*
+                               cumprod((1+Delt(as.numeric(c(DF1$mat[which(DF1$mat$Variables == "ARS/USD (Avg)"),
+                                                                    paste0("",2018)],Devaluation.Argentina.AVG)))[-1]))*
+                               cumprod(1+c(0.008,0.008,0.008)))
+        
+        Administrative.Expense <- c(DF.AGRO$mat[match("Administrative Expense",DF.AGRO$mat$Productos),"2018"],
+                                    DF.AGRO$mat[match("Administrative Expense",DF.AGRO$mat$Productos),"2018"]*
+                                      cumprod(as.numeric(CPI.Argentina)))
+        
+        Others <- DF.AGRO$mat[match("Other Income, Net",DF.AGRO$mat$Productos),paste0("",2018:2021)]
+        
+        ASSS.EBITDA <- ASSS.Gross.Margin + Selling.Expense + Administrative.Expense + Others - 
+          c(DF.AGRO$mat[match("Depreciation and Amortization",DF.AGRO$mat$Productos),"2018"],Depreciation*0.13765)
         
         RP.EBITDA.MARGIN <- RP.EBITDA/RP.TotalSales
-
+        BIP.EBITDA.MARGIN <- BP.EBITDA/BIP.TotalSales
+        ASSS.EBITDA.MARGIN <- ASSS.EBITDA/AG.TotalSales
+        
+        
         Ebitda.Margin <- data.frame(Segment = c("RP", "BIP","ASSS"),
-                                    Ebitda.Margin =    c(as.numeric(RP.EBITDA.MARGIN[paste0("",input$month)]),
-                                                         DF.BIP$mat[match("EBITDA Margin (%)",DF.BIP$mat$Productos),paste0("",input$month)],
-                                                         DF.AGRO$mat[match("EBITDA Margin (%)",DF.AGRO$mat$Productos),paste0("",input$month)]))
+                                    Ebitda.Margin =    c(as.numeric(RP.EBITDA.MARGIN[input$month]),
+                                                         as.numeric(BIP.EBITDA.MARGIN[input$month]),
+                                                         as.numeric(ASSS.EBITDA.MARGIN[input$month])))
         colors=c("#0059b3", "#0086b3", "#001f4d")
         plot_ly(Ebitda.Margin, labels = ~Segment, values = ~Ebitda.Margin, type = 'pie',
                 textposition = 'inside',
@@ -1444,9 +2079,6 @@ server <- function(input, output, session) {
                  color = "green",
                  icon = icon(list(name = "dollar-sign", width="10px")))
       })
-
-
-      # })
       observeEvent(input$saveBtn, {
         session$sendCustomMessage(type = 'testmessage',
                                   message = 'Thank you for clicking')
@@ -1471,13 +2103,6 @@ server <- function(input, output, session) {
       })
     }
 
-    #
-    # observeEvent(input$Logout, {
-    #     USER$Logged <<- FALSE
-    #
-    # })
-    #
-    #
     if (USER$Logged == FALSE) {
       box(title = "Login",textInput("userName", "Username"),
           passwordInput("passwd", "Password"),
@@ -1486,8 +2111,4 @@ server <- function(input, output, session) {
     }
   })
 }
-
-
-
-
 shinyApp(ui, server)
